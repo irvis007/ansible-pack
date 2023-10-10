@@ -1,0 +1,18 @@
+#need to ensure fonts are installed system-wide
+- name: ensure fonts directory
+  file:
+    path: "{{ lookup('env', 'HOME') }}/.fonts"
+    state: directory
+
+- name: EnvyCodeR exists 
+  shell: "ls {{ lookup('env', 'HOME') }}/.fonts/EnvyCodeR"
+  register: envy_exists
+  ignore_errors: yes
+
+- name: Download EnvyCodeNerdFont
+  when: envy_exists is failed
+  ansible.builtin.unarchive:
+    src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/EnvyCodeR.zip
+    dest: "{{ lookup('env', 'HOME') }}/.fonts/"
+    remote_src: yes
+

@@ -1,0 +1,4 @@
+- name: Ensure NTP is installed
+  package: name=ntp state=installed
+- name: Ensure NTP is installed
+  service: name=ntpd state=started enabled=yes
