@@ -1,0 +1,42 @@
+---
+- name: Create group for Ansible executions
+  ansible.builtin.group:
+    name: "{{ ansible_user_name }}"
+    state: present
+  tags: bootstrap
+
+- name: Create user for Ansible executions
+  ansible.builtin.user:
+    name: "{{ ansible_user_name }}"
+    group: "{{ ansible_user_group }}"
+    shell: "{{ ansible_user_shell }}"
+    home: "{{ ansible_user_home }}"
+    state: present
+  tags: bootstrap
+
+- name: Add SSH key for ansible user
+  ansible.builtin.authorized_key:
+    user: "{{ ansible_user_name }}"
+    key: "{{ lookup('file', ansible_ssh_public_key_file) }}"
+    state: present
+  tags: bootstrap
+  when: ansible_ssh_public_key_file is defined
+
+- name: Configure sudo for ansible user
+  ansible.builtin.template:
+    src: sudoers_ansible.j2
+    dest: /etc/sudoers.d/ansible
+    mode: 0440
+    owner: root
+    group: root
+    validate: /usr/sbin/visudo -cf %s
+  tags: bootstrap
+
+- name: Display security warning if passwordless sudo is enabled
+  ansible.builtin.debug:
+    msg: |
+      ⚠️  WARNING: Passwordless sudo is enabled for user '{{ ansible_user_name }}'
+      This is a SECURITY RISK in production environments!
+      Set 'sudo_require_password: true' in group_vars for production.
+  when: sudo_passwordless_allowed | bool
+  tags: bootstrap

@@ -1,0 +1,142 @@
+---
+# include tasks to set install node in the system
+- import_tasks: setup-debian.yml
+- import_tasks: nodejs.yml
+
+- name: "[nvim] Include user-specific variables"
+  include_vars: vars.yml
+  tags: nvim
+
+- name: Update apt Cache
+  become: true
+  ansible.builtin.package:
+    update_cache: yes
+    force_apt_get: yes
+  tags:
+    - nvim
+
+# case when you have ie unattended upgrade enabled
+- name: Wait for APT Lock
+  ansible.builtin.shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+  tags:
+    - nvim
+
+# Install nvim dependencies
+- name: '[nvim] Install "you complete me" dependencies'
+  become: true
+  ansible.builtin.package: name={{ item }} state=present
+  with_items:
+    - build-essential
+    - cmake
+  tags:
+    - nvim
+
+# Install nvim with snap
+- name: "[nvim] Install neovim with snap package manager"
+  become: true
+  community.general.snap:
+    name: nvim
+    classic: yes
+  tags:
+    - nvim
+
+# Install AstroVim dependencies
+- name: "[AstroVim] Install dependencies with package manager"
+  become: true
+  ansible.builtin.package: name={{ item }} state=present
+  with_items:
+    - terminator
+    - gdu
+    - tar
+    - git
+    - fd-find
+    - ripgrep
+  tags:
+    - nvim
+
+- name: "[AstroVim] Get latest lazygit release info"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+    return_content: true
+    body_format: json
+  register: lazygit_release
+  tags:
+    - nvim
+
+- name: "[AstroVim] Set lazygit version"
+  ansible.builtin.set_fact:
+    lazygit_version: "{{ lazygit_release.json.tag_name | regex_replace('^v', '') }}"
+  tags:
+    - nvim
+
+- name: "[AstroVim] Check if lazygit is already installed"
+  ansible.builtin.command: lazygit --version
+  register: lazygit_installed
+  changed_when: false
+  failed_when: false
+  tags:
+    - nvim
+
+- name: "[AstroVim] Download lazygit"
+  ansible.builtin.get_url:
+    url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+    dest: "/tmp/lazygit.tar.gz"
+    mode: '0644'
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Extract lazygit"
+  ansible.builtin.unarchive:
+    src: "/tmp/lazygit.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Install lazygit globally"
+  ansible.builtin.copy:
+    src: "/tmp/lazygit"
+    dest: "/usr/local/bin/lazygit"
+    mode: '0755'
+    remote_src: true
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Cleanup lazygit installation files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/lazygit.tar.gz"
+    - "/tmp/lazygit"
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: '[AstroVim] Install "tree-sitter-cli" node.js package globally.Install "tree-sitter-cli" node.js package globally'
+  become: true
+  community.general.npm:
+    name: tree-sitter-cli
+    global: true
+  tags:
+    - nvim
+
+## restore AstroVim config
+- name: "[AstroVim] Install AstroVim for user, this step copies user config as well"
+  ansible.builtin.git:
+    repo: https://github.com/irvis007/astroVim-v4.git
+    dest: ~/.config/nvim
+    depth: 1
+  tags:
+    - nvim
+
+# Initialize AstroNvim
+- name: "[AstroNvim] initialize AstroNvim"
+  ansible.builtin.shell: nvim --headless -c 'quitall'

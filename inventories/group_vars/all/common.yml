@@ -1,0 +1,14 @@
+---
+# Common configuration for all hosts
+
+# SSH Configuration
+ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key.pub"
+ssh_default_port: 22
+
+# User Management
+ansible_user_name: ansible
+ansible_user_group: ansible
+
+# System Configuration
+system_timezone: UTC
+system_locale: en_US.UTF-8

@@ -1,0 +1,37 @@
+---
+### fail2ban
+fail2ban_enabled: true
+fail2ban_bantime: 1w
+fail2ban_findtime: 60m
+fail2ban_maxretry: 3
+
+### UFW Configuration
+ufw_enabled: true
+ufw_logging: "on"
+ufw_default_incoming_policy: deny
+ufw_default_outgoing_policy: allow
+ufw_enable_ipv6: false
+
+# UFW Rules - Define your firewall rules here
+# Format: { rule: 'allow', port: '22', proto: 'tcp', comment: 'SSH' }
+ufw_rules:
+  - rule: allow
+    port: "{{ ssh_custom_port }}"
+    proto: tcp
+    comment: "SSH (Custom Port)"
+  # Uncomment for web server
+  # - rule: allow
+  #   port: "80"
+  #   proto: tcp
+  #   comment: "HTTP"
+  # - rule: allow
+  #   port: "443"
+  #   proto: tcp
+  #   comment: "HTTPS"
+
+### suricata
+suricata_enabled: false
+suricata_local_rules: []
+suricata_rules_dir: /etc/suricata/rules/
+suricata_log_dir_certs: /var/log/suricata/certs/
+suricata_log_dir: /var/log/suricata/files/

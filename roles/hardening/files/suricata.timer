@@ -1,0 +1,10 @@
+[Unit]
+Description=Suricata Timer
+
+[Timer]
+OnCalendar=*-*-* 00:15:30    # everyday 15 min after midninght  
+Persistent=true
+StopWhenUnneeded=yes
+
+[Install]
+WantedBy=timers.target

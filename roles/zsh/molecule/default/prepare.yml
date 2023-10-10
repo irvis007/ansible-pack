@@ -1,0 +1,37 @@
+---
+# Prepare playbook - sets up test environment
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure required packages are present
+      ansible.builtin.package:
+        name:
+          - git
+          - curl
+          - sudo
+        state: present
+
+    - name: Create test user if not exists
+      ansible.builtin.user:
+        name: test
+        state: present
+        create_home: true
+        shell: /bin/bash
+      when: ansible_user_id is not defined or ansible_user_id != 'test'
+
+    - name: Ensure test user has proper home directory
+      ansible.builtin.file:
+        path: /home/test
+        state: directory
+        owner: test
+        group: test
+        mode: '0755'

@@ -1,0 +1,72 @@
+---
+# LXD Integration Test: Server Hardening
+# Tests bootstrap + hardening roles together
+
+- name: Test Server Hardening in LXD
+  hosts: test_servers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display test information
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Testing Server Hardening
+          ========================================
+          Host: {{ inventory_hostname }}
+          Image: {{ lxd_image | default('unknown') }}
+          Testing: Bootstrap + Hardening
+          ========================================
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - role: bootstrap
+      when: run_bootstrap | default(true)
+
+    - role: hardening
+      when: run_hardening | default(true)
+
+  post_tasks:
+    - name: Verify security configurations
+      block:
+        - name: Check if ansible user exists
+          ansible.builtin.command: id ansible
+          register: ansible_user_check
+          changed_when: false
+          failed_when: false
+
+        - name: Check UFW status
+          ansible.builtin.command: ufw status
+          register: ufw_check
+          changed_when: false
+          failed_when: false
+
+        - name: Check fail2ban status
+          ansible.builtin.command: systemctl is-active fail2ban
+          register: fail2ban_check
+          changed_when: false
+          failed_when: false
+
+        - name: Display verification results
+          ansible.builtin.debug:
+            msg: |
+              ========================================
+              Server Hardening Test Results
+              ========================================
+              Ansible User: {{ 'PASSED' if ansible_user_check.rc == 0 else 'FAILED' }}
+              UFW: {{ 'CONFIGURED' if 'Status' in ufw_check.stdout else 'NOT CONFIGURED' }}
+              Fail2ban: {{ 'RUNNING' if fail2ban_check.rc == 0 and fail2ban_check.stdout == 'active' else 'NOT RUNNING' }}
+              ========================================
+
+        - name: Assert security configurations
+          ansible.builtin.assert:
+            that:
+              - ansible_user_check.rc == 0
+            fail_msg: "Server hardening checks failed"
+            success_msg: "Server hardening completed successfully!"

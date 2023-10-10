@@ -1,0 +1,49 @@
+---
+# VPS: Internet-facing production servers
+# Characteristics: Minimal tools, maximum hardening, security-first
+
+# Core roles
+install_utilities: false
+install_zsh: false
+install_astronvim: false
+install_fonts: false
+
+# DevOps tools - minimal
+devops_tools_enabled: false
+
+# Security - Maximum hardening for internet-facing
+apply_hardening: true
+sudo_passwordless_allowed: false
+
+# Hardening configuration - Enable everything
+hardening_enable_fail2ban: true
+hardening_enable_ufw: true
+hardening_enable_ssh_hardening: true  # Critical for internet-facing
+hardening_enable_os_hardening: true
+hardening_enable_unattended_upgrades: true
+hardening_enable_suricata: false  # Optional IDS (resource intensive)
+
+# SSH - Maximum security
+ssh_custom_port: 65522  # Non-standard port
+ssh_password_authentication: "no"  # Key-only authentication
+
+# Firewall - Strict rules
+ufw_enabled: true
+ufw_default_incoming_policy: deny
+ufw_default_outgoing_policy: allow
+ufw_rules:
+  - rule: allow
+    port: "{{ ssh_custom_port }}"
+    proto: tcp
+    comment: "SSH"
+  - rule: allow
+    port: "80"
+    proto: tcp
+    comment: "HTTP"
+  - rule: allow
+    port: "443"
+    proto: tcp
+    comment: "HTTPS"
+
+# Monitoring (if monitoring role created)
+monitoring_enabled: true

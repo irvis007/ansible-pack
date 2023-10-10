@@ -1,0 +1,34 @@
+---
+# - import_tasks: fail2ban.yml
+# - import_tasks: ufw.yml
+# - import_tasks: updates.yml
+- import_tasks: suricata.yml
+# - name: harden ssh role
+#   ansible.builtin.include_role:
+#     name: devsec.hardening.ssh_hardening
+#   vars:
+#     network_ipv6_enable: false
+#     sftp_enabled: false
+#     ssh_allow_users: "{{ ansible_user_id }}"
+#     ssh_client_port: 22 #change it mate :)
+#     ssh_client_alive_count: 2
+#     ssh_max_auth_retries: 3
+#     ssh_max_sessions: 2
+#     ssh_print_last_log: true
+#   tags: hardening
+#
+# - name: harden os role
+#   ansible.builtin.include_role:
+#     name: devsec.hardening.os_hardening
+#   vars:
+#     sysctl_overwrite:
+#       # Enable IPv4 traffic forwarding.
+#       # for docker and WireGuard
+#       net.ipv4.ip_forward: 1
+#     ufw_enable_ipv6: false
+#   tags: hardening
+#
+# - name: install ClamAV
+#   ansible.builtin.include_role:
+#     role: geerlingguy.clama#   tags: hardening
+#   tags: hardening

@@ -1,0 +1,12 @@
+# Proxmox credentials (never commit!)
+.proxmox_credentials
+
+# Ansible retry files
+*.retry
+
+# VM state files
+.vm_state/
+
+# Temporary files
+*.tmp
+*.log

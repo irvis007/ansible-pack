@@ -1,0 +1,10 @@
+---
+# unatendetupdates
+
+- name: install unattended upgrades
+  ansible.builtin.include_role:
+    name: hifis.toolkit.unattended_upgrades
+  vars:
+    unattended_remove_unused_dependencies: true
+    unattended_remove_unused_kernel_packages: true
+    unattended_clean_interval: 7

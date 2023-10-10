@@ -1,0 +1,12 @@
+---
+- name: restart fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
+  listen: "restart fail2ban"
+
+- name: reload ufw
+  ansible.builtin.service:
+    name: ufw
+    state: reloaded
+  listen: "reload ufw"

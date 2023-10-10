@@ -1,0 +1,66 @@
+---
+# UFW Firewall Configuration
+- name: Install UFW with package manager
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: ufw
+
+- name: Set UFW logging level
+  community.general.ufw:
+    logging: "{{ ufw_logging }}"
+  when: ufw_enabled | bool
+
+- name: Set UFW default incoming policy
+  community.general.ufw:
+    direction: incoming
+    policy: "{{ ufw_default_incoming_policy }}"
+  when: ufw_enabled | bool
+
+- name: Set UFW default outgoing policy
+  community.general.ufw:
+    direction: outgoing
+    policy: "{{ ufw_default_outgoing_policy }}"
+  when: ufw_enabled | bool
+
+- name: Configure UFW rules
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port | default(omit) }}"
+    proto: "{{ item.proto | default(omit) }}"
+    from_ip: "{{ item.from_ip | default(omit) }}"
+    to_ip: "{{ item.to_ip | default(omit) }}"
+    comment: "{{ item.comment | default(omit) }}"
+  loop: "{{ ufw_rules }}"
+  when:
+    - ufw_enabled | bool
+    - ufw_rules is defined
+  notify: reload ufw
+
+- name: Block IPv6 traffic if disabled
+  community.general.ufw:
+    rule: deny
+    proto: ipv6
+    direction: "{{ item }}"
+  loop:
+    - in
+    - out
+  when:
+    - ufw_enabled | bool
+    - not ufw_enable_ipv6 | bool
+  notify: reload ufw
+
+- name: Display SSH port warning
+  ansible.builtin.debug:
+    msg: |
+      ⚠️  IMPORTANT: SSH is configured on port {{ ssh_custom_port }}
+      Make sure you can connect via this port before enabling UFW!
+      Test with: ssh -p {{ ssh_custom_port }} {{ ansible_user }}@{{ ansible_host }}
+  when:
+    - ufw_enabled | bool
+    - ssh_custom_port != 22
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  when: ufw_enabled | bool

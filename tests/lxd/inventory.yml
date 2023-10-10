@@ -1,0 +1,60 @@
+---
+# LXD Integration Testing Inventory
+# This inventory defines LXD containers used for integration testing
+
+all:
+  vars:
+    environment_name: testing
+    ansible_connection: lxd
+    # LXD containers don't need SSH initially
+    ansible_python_interpreter: /usr/bin/python3
+
+  children:
+    lxd_containers:
+      vars:
+        # Common settings for all LXD test containers
+        sudo_passwordless_allowed: true
+        ufw_enabled: false  # Simplified for testing
+
+      children:
+        test_workstations:
+          hosts:
+            test-workstation-ubuntu:
+              ansible_host: test-workstation-ubuntu
+              lxd_image: ubuntu:22.04
+              install_docker: true
+              install_nvim: true
+              install_zsh: true
+
+        test_servers:
+          hosts:
+            test-server-ubuntu:
+              ansible_host: test-server-ubuntu
+              lxd_image: ubuntu:22.04
+              run_bootstrap: true
+              run_hardening: true
+
+            # test-server-debian:
+            #   ansible_host: test-server-debian
+            #   lxd_image: debian:12
+            #   run_bootstrap: true
+            #   run_hardening: true
+
+# Example: Multiple workstation configurations
+    multi_config:
+      hosts:
+        dev-workstation:
+          ansible_host: dev-workstation
+          lxd_image: ubuntu:22.04
+          workstation_type: development
+          install_docker: true
+          install_nvim: true
+          install_zsh: true
+
+        minimal-workstation:
+          ansible_host: minimal-workstation
+          lxd_image: ubuntu:22.04
+          workstation_type: minimal
+          install_docker: false
+          install_nvim: true
+          install_zsh: true

@@ -1,0 +1,18 @@
+---
+nerdfonts_deb_env: 'system'  # 'system' | 'user' | users'
+
+nerdfonts_deb_fonts_sys_dir: '/usr/share/fonts'
+nerdfonts_deb_fonts_user_dir: '~/.local/share/fonts'
+
+# Nerd Fonts Configuration
+nerdfonts_version: "v3.0.2"
+nerdfonts_base_url: "https://github.com/ryanoasis/nerd-fonts/releases/download"
+
+# Font checksums (SHA256)
+# You should verify these checksums from the official GitHub releases page
+# https://github.com/ryanoasis/nerd-fonts/releases
+nerdfonts_checksums:
+  EnvyCodeR: "sha256:https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/EnvyCodeR.zip"
+  # Add more fonts with their checksums as needed
+  # FiraCode: "sha256:xxxxx"
+  # JetBrainsMono: "sha256:xxxxx"

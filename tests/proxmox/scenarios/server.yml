@@ -1,0 +1,83 @@
+---
+# Proxmox Acceptance Test: Server Hardening
+# Tests bootstrap + hardening roles on full VM
+
+- name: Test Server Hardening on Proxmox VM
+  hosts: test_servers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display test information
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Testing Server Hardening on Proxmox
+          ========================================
+          Host: {{ inventory_hostname }}
+          VMID: {{ vmid }}
+          Template: {{ template }}
+          Testing: Bootstrap + Hardening
+          ========================================
+
+    - name: Wait for cloud-init to complete
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+      register: cloud_init_status
+      failed_when: false
+
+    - name: Display cloud-init status
+      ansible.builtin.debug:
+        msg: "Cloud-init status: {{ cloud_init_status.stdout | default('completed') }}"
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - role: bootstrap
+      when: run_bootstrap | default(true)
+
+    - role: hardening
+      when: run_hardening | default(true)
+
+  post_tasks:
+    - name: Verify security configurations
+      block:
+        - name: Check if ansible user exists
+          ansible.builtin.command: id ansible
+          register: ansible_user_check
+          changed_when: false
+          failed_when: false
+
+        - name: Check UFW status
+          ansible.builtin.command: ufw status
+          register: ufw_check
+          changed_when: false
+          failed_when: false
+
+        - name: Check Suricata status
+          ansible.builtin.command: systemctl is-active suricata
+          register: suricata_check
+          changed_when: false
+          failed_when: false
+
+        - name: Display verification results
+          ansible.builtin.debug:
+            msg: |
+              ========================================
+              Server Hardening Test Results
+              ========================================
+              Ansible User: {{ 'PASSED' if ansible_user_check.rc == 0 else 'FAILED' }}
+              UFW: {{ 'CONFIGURED' if 'Status' in ufw_check.stdout else 'NOT CONFIGURED' }}
+              Suricata: {{ 'RUNNING' if suricata_check.rc == 0 and suricata_check.stdout == 'active' else 'NOT RUNNING' }}
+              ========================================
+
+        - name: Assert security configurations
+          ansible.builtin.assert:
+            that:
+              - ansible_user_check.rc == 0
+            fail_msg: "Server hardening checks failed"
+            success_msg: "Server hardening completed successfully!"

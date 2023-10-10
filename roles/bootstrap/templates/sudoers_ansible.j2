@@ -1,0 +1,17 @@
+# Ansible managed sudoers configuration
+# WARNING: This file is managed by Ansible - manual changes will be overwritten
+#
+# Environment: {{ environment_name | default('unknown') }}
+# Generated: {{ ansible_date_time.iso8601 }}
+
+{% if sudo_passwordless_allowed | bool %}
+# DEVELOPMENT MODE: Passwordless sudo enabled
+# ⚠️  This is a SECURITY RISK - should only be used in development/testing
+%{{ ansible_user_group }} ALL=(ALL:ALL) NOPASSWD:ALL
+{% else %}
+# PRODUCTION MODE: Password required for sudo
+%{{ ansible_user_group }} ALL=(ALL:ALL) ALL
+{% endif %}
+
+# Additional security: Restrict to specific commands if needed (commented out by default)
+# {{ ansible_user_name }} ALL=(ALL) NOPASSWD: /usr/bin/systemctl, /usr/bin/apt, /usr/bin/yum

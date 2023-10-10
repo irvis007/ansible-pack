@@ -1,0 +1,5 @@
+[Unit]
+Description=Suricata Target
+
+[Install]
+WantedBy=multi-user.target

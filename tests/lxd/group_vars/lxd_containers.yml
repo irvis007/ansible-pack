@@ -1,0 +1,50 @@
+---
+# Common variables for LXD integration testing containers
+
+# Testing environment settings
+environment_name: testing
+testing_mode: true
+
+# Relaxed security for testing
+ufw_enabled: false
+ssh_password_authentication: "no"
+
+# Faster testing settings
+apt_cache_valid_time: 3600
+
+# Common packages for testing
+common_packages:
+  - curl
+  - git
+  - vim
+  - sudo
+
+# Test user settings
+test_user: testuser
+test_user_groups:
+  - sudo
+
+# ZSH settings for testing
+zsh_local_user: "{{ test_user | default('root') }}"
+
+# Docker settings for testing
+docker_users:
+  - "{{ test_user | default('root') }}"
+
+# Logging
+verbose_output: true
+
+# Bootstrap role variables (required)
+ansible_user_name: ansible
+ansible_user_group: ansible
+ansible_user_shell: /bin/bash
+ansible_user_home: /home/ansible
+ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key.pub"
+
+# SSH Configuration
+ssh_default_port: 22
+ssh_custom_port: 65522
+
+# Security Settings (relaxed for testing)
+sudo_require_password: false
+sudo_passwordless_allowed: true

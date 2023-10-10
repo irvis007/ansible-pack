@@ -1,0 +1,75 @@
+---
+- name: '[debian] Include Debian-specific variables'
+  include_vars: debian.yml
+  tags: nerdfonts
+
+- name: '[debian] Setting nerdfonts_install_dir for system-wide installation'
+  set_fact:
+    nerdfonts_install_dir: "{{ nerdfonts_deb_fonts_sys_dir }}"
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: '[debian] Create NerdFonts folder for system-wide installation'
+  become: true
+  file:
+    path: "{{ nerdfonts_install_dir }}/NerdFonts"
+    state: directory
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: '[debian] Create EnvyCodeR folder'
+  become: true
+  file:
+    path: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"
+    state: directory
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: '[debian] Check if EnvyCodeR font is already installed'
+  ansible.builtin.stat:
+    path: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR/EnvyCodeRNerdFont-Regular.ttf"
+  register: envycode_installed
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: '[debian] Download EnvyCodeNerdFont'
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ nerdfonts_base_url }}/{{ nerdfonts_version }}/EnvyCodeR.zip"
+    dest: "/tmp/EnvyCodeR.zip"
+    mode: '0644'
+    # Note: For production, add checksum verification
+    # checksum: "{{ nerdfonts_checksums.EnvyCodeR }}"
+  when:
+  - nerdfonts_deb_env is defined
+  - not envycode_installed.stat.exists
+  tags: nerdfonts
+
+- name: '[debian] Extract EnvyCodeNerdFont'
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/EnvyCodeR.zip"
+    dest: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"
+    remote_src: yes
+  when:
+  - nerdfonts_deb_env is defined
+  - not envycode_installed.stat.exists
+  tags: nerdfonts
+
+- name: '[debian] Cleanup font archive'
+  ansible.builtin.file:
+    path: "/tmp/EnvyCodeR.zip"
+    state: absent
+  become: true
+  when:
+  - nerdfonts_deb_env is defined
+  - not envycode_installed.stat.exists
+  tags: nerdfonts
+
+- name: '[debian] Update the Fonts Cache'
+  command: "fc-cache -fv" 
+  tags: nerdfonts

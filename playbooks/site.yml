@@ -1,0 +1,13 @@
+---
+# Site-wide Playbook
+# Main entry point that runs appropriate setup based on host groups
+
+- name: Import workstation setup
+  ansible.builtin.import_playbook: workstation_setup.yml
+  when: "'workstations' in group_names"
+  tags: ['workstation']
+
+- name: Import server setup
+  ansible.builtin.import_playbook: server_setup.yml
+  when: "'servers' in group_names"
+  tags: ['server']

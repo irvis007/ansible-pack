@@ -1,0 +1,66 @@
+---
+# Molecule configuration for zsh role testing
+dependency:
+  name: galaxy
+  options:
+    requirements-file: ../../../../meta/requirements.yml
+
+driver:
+  name: docker
+
+platforms:
+  # Ubuntu 22.04 LTS - simplified, no systemd needed for ZSH testing
+  - name: zsh-ubuntu22
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+
+  # Debian 12 (Bookworm) - simplified
+  - name: zsh-debian12
+    image: geerlingguy/docker-debian12-ansible:latest
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  log: true
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/../../"
+  config_options:
+    defaults:
+      callbacks_enabled: profile_tasks,timer
+      stdout_callback: yaml
+      verbosity: 1
+      remote_tmp: /tmp/.ansible-${USER}/tmp
+  inventory:
+    host_vars:
+      zsh-ubuntu22:
+        ansible_user_id: test
+        ansible_env:
+          HOME: /home/test
+      zsh-debian12:
+        ansible_user_id: test
+        ansible_env:
+          HOME: /home/test
+
+verifier:
+  name: ansible
+
+scenario:
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
+
+  converge_sequence:
+    - dependency
+    - create
+    - prepare
+    - converge

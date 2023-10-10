@@ -1,0 +1,117 @@
+---
+# Verify playbook - tests that zsh role worked correctly
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: false
+
+  vars:
+    # Note: The ZSH role currently installs to root's home directory
+    # TODO: Update role to support user-specific installations
+    test_user: root
+    test_home: /root
+
+  tasks:
+    - name: Check if ZSH is installed
+      ansible.builtin.command: zsh --version
+      changed_when: false
+      register: zsh_version
+
+    - name: Display ZSH version
+      ansible.builtin.debug:
+        msg: "ZSH version: {{ zsh_version.stdout }}"
+
+    - name: Check if root user shell is ZSH
+      ansible.builtin.command: getent passwd {{ test_user }}
+      changed_when: false
+      register: user_shell
+
+    - name: Verify user shell is ZSH
+      ansible.builtin.assert:
+        that:
+          - "'/zsh' in user_shell.stdout"
+        fail_msg: "Root user shell is not ZSH: {{ user_shell.stdout }}"
+        success_msg: "Root user shell is correctly set to ZSH"
+
+    - name: Check if Oh-My-Zsh directory exists
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh"
+      register: ohmyzsh_dir
+
+    - name: Verify Oh-My-Zsh installation
+      ansible.builtin.assert:
+        that:
+          - ohmyzsh_dir.stat.exists
+          - ohmyzsh_dir.stat.isdir
+        fail_msg: "Oh-My-Zsh directory not found at {{ test_home }}/.oh-my-zsh"
+        success_msg: "Oh-My-Zsh installed successfully"
+
+    - name: Check for zsh-autosuggestions plugin
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+      register: autosuggestions
+
+    - name: Verify zsh-autosuggestions plugin
+      ansible.builtin.assert:
+        that:
+          - autosuggestions.stat.exists
+        fail_msg: "zsh-autosuggestions plugin not found"
+        success_msg: "zsh-autosuggestions plugin installed"
+
+    - name: Check for zsh-completions plugin
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh/custom/plugins/zsh-completions"
+      register: completions
+
+    - name: Verify zsh-completions plugin
+      ansible.builtin.assert:
+        that:
+          - completions.stat.exists
+        fail_msg: "zsh-completions plugin not found"
+        success_msg: "zsh-completions plugin installed"
+
+    - name: Check for zsh-syntax-highlighting plugin
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+      register: highlighting
+
+    - name: Verify zsh-syntax-highlighting plugin
+      ansible.builtin.assert:
+        that:
+          - highlighting.stat.exists
+        fail_msg: "zsh-syntax-highlighting plugin not found"
+        success_msg: "zsh-syntax-highlighting plugin installed"
+
+    - name: Check for autoupdate plugin
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh/custom/plugins/autoupdate"
+      register: autoupdate
+
+    - name: Verify autoupdate plugin
+      ansible.builtin.assert:
+        that:
+          - autoupdate.stat.exists
+        fail_msg: "autoupdate plugin not found"
+        success_msg: "autoupdate plugin installed"
+
+    - name: Check for Powerline10k theme
+      ansible.builtin.stat:
+        path: "{{ test_home }}/.oh-my-zsh/custom/themes/powerlevel10k"
+      register: p10k_theme
+
+    - name: Display test summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          ZSH ROLE VERIFICATION SUMMARY
+          ========================================
+          ✅ ZSH installed: {{ zsh_version.stdout }}
+          ✅ User shell: {{ 'ZSH' if '/zsh' in user_shell.stdout else 'NOT ZSH' }}
+          ✅ Oh-My-Zsh: {{ 'Installed' if ohmyzsh_dir.stat.exists else 'Missing' }}
+          ✅ Plugins:
+             - autosuggestions: {{ 'Yes' if autosuggestions.stat.exists else 'No' }}
+             - completions: {{ 'Yes' if completions.stat.exists else 'No' }}
+             - syntax-highlighting: {{ 'Yes' if highlighting.stat.exists else 'No' }}
+             - autoupdate: {{ 'Yes' if autoupdate.stat.exists else 'No' }}
+          ✅ Powerlevel10k: {{ 'Yes' if p10k_theme.stat.exists else 'No' }}
+          ========================================

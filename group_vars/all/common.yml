@@ -1,0 +1,31 @@
+---
+# Common variables for all hosts
+ansible_python_interpreter: /usr/bin/python3
+
+# Ansible User Configuration
+ansible_user_name: ansible
+ansible_user_group: ansible
+ansible_user_shell: /bin/bash
+ansible_user_home: /home/ansible
+
+# SSH Configuration
+# Path to SSH public key for ansible user
+# This can be overridden in inventory or host_vars
+ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key.pub"
+
+# SSH Port Configuration
+ssh_default_port: 22
+ssh_custom_port: 65522
+
+# Security Settings
+# Set to true in production, false in development for easier testing
+sudo_require_password: false  # CHANGE TO true IN PRODUCTION!
+sudo_passwordless_allowed: true  # CHANGE TO false IN PRODUCTION!
+
+# System Configuration
+system_timezone: "UTC"
+system_locale: "en_US.UTF-8"
+
+# Package Management
+package_update_cache: true
+package_cache_valid_time: 3600

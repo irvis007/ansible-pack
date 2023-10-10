@@ -1,0 +1,64 @@
+---
+# Proxmox Acceptance Testing Inventory
+# This inventory defines Proxmox VMs used for Layer 3 acceptance testing
+
+all:
+  vars:
+    environment_name: testing
+    ansible_connection: ssh
+    ansible_user: ansible
+    ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key"
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+    # Proxmox connection (for VM provisioning)
+    proxmox_host: "{{ lookup('env', 'PROXMOX_HOST') | default('pve.local') }}"
+    proxmox_api_user: "{{ lookup('env', 'PROXMOX_USER') | default('root@pam') }}"
+    proxmox_api_token_id: "{{ lookup('env', 'PROXMOX_TOKEN_ID') | default('ansible-test') }}"
+    proxmox_api_token_secret: "{{ lookup('env', 'PROXMOX_TOKEN') }}"
+    proxmox_node: "{{ lookup('env', 'PROXMOX_NODE') | default('pve') }}"
+    proxmox_validate_certs: false
+
+  children:
+    proxmox_vms:
+      vars:
+        # VM resource defaults
+        cores: 1
+        memory: 2048
+        disk_size: 20
+        network_bridge: "{{ lookup('env', 'BRIDGE') | default('vmbr0') }}"
+        storage: "{{ lookup('env', 'STORAGE') | default('local-lvm') }}"
+
+        # Test-specific settings (match LXD for consistency)
+        sudo_passwordless_allowed: true
+        ufw_enabled: false
+
+      children:
+        test_workstations:
+          hosts:
+            test-workstation-ubuntu:
+              # ansible_host will be set dynamically after VM creation
+              ansible_host: "192.168.0.128"
+              vmid: 123
+              template: 9000 # Ubuntu 22.04 template
+              install_docker: true
+              install_nvim: true
+              install_zsh: true
+
+        test_servers:
+          hosts:
+            test-server-ubuntu:
+              # ansible_host will be set dynamically after VM creation
+              ansible_host: "{{ lookup('env', 'TEST_SERVER_IP') | default('192.168.1.101') }}"
+              vmid: 101
+              template: 9000 # Ubuntu 22.04 template
+              run_bootstrap: true
+              run_hardening: true
+
+            # Debian server (optional - enable when Debian template is ready)
+            # test-server-debian:
+            #   ansible_host: "{{ lookup('env', 'TEST_SERVER_DEBIAN_IP') | default('192.168.1.102') }}"
+            #   vmid: 102
+            #   template: 9001  # Debian 12 template
+            #   run_bootstrap: true
+            #   run_hardening: true

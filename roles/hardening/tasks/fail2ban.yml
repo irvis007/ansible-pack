@@ -1,0 +1,22 @@
+---
+# fail2ban
+- name: Install fail2ban with package manager
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: fail2ban
+
+- name: update configuration file - /etc/fail2ban/fail2ban.local
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart fail2ban
+
+- name: start and enable fail2ban service
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

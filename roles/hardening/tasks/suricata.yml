@@ -1,0 +1,77 @@
+---
+- name: add suricata repository from PPA and install its signing key on Ubuntu target
+  ansible.builtin.apt_repository:
+    repo: ppa:oisf/suricata-stable
+    state: present
+
+- name: install suricata
+  become: true
+  ansible.builtin.package:
+    name: suricata
+    state: present
+
+- name: "Ensure required directories exist: /etc/init; {{ suricata_log_dir }}; {{ suricata_log_dir_certs }}; {{ suricata_rules_dir }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  loop:
+    - "/etc/init"
+    - "{{ suricata_log_dir }}"
+    - "{{ suricata_log_dir_certs }}"
+    - "{{ suricata_rules_dir }}"
+
+- name: start and enable suricata service
+  ansible.builtin.service:
+    name: suricata
+    state: started
+    enabled: true
+
+- name: copy suricata init script file
+  template:
+    src: init-suricata.conf
+    dest: /etc/init/suricata.conf
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
+    force: true
+
+# copy config files,
+- name: copy suricata.yaml config files
+  template:
+    src: suricata.yaml.j2
+    dest: /etc/suricata/suricata.yaml
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
+    force: true
+
+- name: copy local rules file
+  template:
+    src: local.rules.j2
+    dest: "{{ suricata_rules_dir }}/local.rules"
+    owner: root
+    group: root
+    mode: 0660
+    backup: yes
+    force: true
+
+- name: set up suricata rules update timer
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/systemd/system/
+  loop:
+    - suricata.timer
+    - suricata.target
+    - suricata-update.service
+
+- name: start and enable suricata-update service
+  ansible.builtin.service:
+    name: suricata-update
+    state: started
+    enabled: true

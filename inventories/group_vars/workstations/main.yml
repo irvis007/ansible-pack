@@ -1,0 +1,28 @@
+---
+# Workstations: Development machines and personal laptops
+# Characteristics: All tools installed, minimal hardening, convenience over security
+
+# Core roles
+install_utilities: true
+install_zsh: true
+install_astronvim: true
+install_fonts: true
+
+# DevOps tools (optional, enable for work machines)
+devops_tools_enabled: false
+devops_tools_install_docker: false
+devops_tools_install_terragrunt: false
+devops_tools_install_tenv: false
+
+# Cloud tools (optional)
+cloud_tools_enabled: false
+cloud_tools_install_kubectl: false
+cloud_tools_install_aws_cli: false
+
+# Security - Minimal for workstations
+apply_hardening: false
+sudo_passwordless_allowed: true
+ufw_enabled: false
+
+# Package Management
+package_update_cache: true

@@ -1,0 +1,39 @@
+---
+# Ansible Pack Inventory
+# Copy this file to hosts.yml and customize for your environment
+# The hosts.yml file is gitignored to protect your infrastructure details
+
+all:
+  children:
+    # Development workstations and laptops
+    workstations:
+      hosts:
+        localhost:
+          ansible_connection: local
+        # my-laptop:
+        #   ansible_host: 192.168.1.10
+        # work-machine:
+        #   ansible_host: 192.168.1.11
+
+    # Homelab servers (internal network)
+    servers:
+      hosts:
+        # homelab-server-01:
+        #   ansible_host: 192.168.1.20
+        # homelab-server-02:
+        #   ansible_host: 192.168.1.21
+
+    # Internet-facing VPS servers
+    vps:
+      hosts:
+        # vps-prod-01:
+        #   ansible_host: 203.0.113.10
+        #   ssh_custom_port: 65522
+        # vps-prod-02:
+        #   ansible_host: 203.0.113.11
+        #   ssh_custom_port: 65522
+
+  vars:
+    # Global variables for all hosts
+    ansible_user: "{{ lookup('env', 'USER') }}"
+    ansible_become: true

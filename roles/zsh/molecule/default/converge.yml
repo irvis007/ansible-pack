@@ -1,0 +1,27 @@
+---
+# Converge playbook - applies the zsh role
+- name: Converge
+  hosts: all
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    - name: Create test user
+      ansible.builtin.user:
+        name: test
+        shell: /bin/bash
+        create_home: true
+      become: true
+
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+      vars:
+        # Override for testing
+        zsh_local_user: test

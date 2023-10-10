@@ -1,0 +1,9 @@
+---
+roles:
+  - name: geerlingguy.clamav
+    src: git@github.com:geerlingguy/ansible-role-clamav.git
+    scm: git
+
+collections:
+  - name: devsec.hardening
+  - name: hifis.toolkit

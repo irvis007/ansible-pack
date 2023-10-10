@@ -1,0 +1,37 @@
+---
+# Servers: Homelab internal servers
+# Characteristics: Selected tools, moderate hardening, internal network
+
+# Core roles
+install_utilities: false  # Servers don't need fancy CLI tools
+install_zsh: false
+install_astronvim: false
+install_fonts: false
+
+# DevOps tools
+devops_tools_enabled: true
+devops_tools_install_docker: true
+devops_tools_docker_users: ["{{ ansible_user }}"]
+
+# Security - Moderate hardening
+apply_hardening: true
+sudo_passwordless_allowed: false
+
+# Hardening configuration
+hardening_enable_fail2ban: true
+hardening_enable_ufw: true
+hardening_enable_ssh_hardening: false  # Internal network
+hardening_enable_os_hardening: true
+hardening_enable_unattended_upgrades: true
+
+# SSH
+ssh_custom_port: 22  # Internal network, standard port OK
+ssh_password_authentication: "no"
+
+# Firewall
+ufw_enabled: true
+ufw_rules:
+  - rule: allow
+    port: "22"
+    proto: tcp
+    comment: "SSH"

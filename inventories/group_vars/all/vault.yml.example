@@ -1,0 +1,17 @@
+---
+# Ansible Vault Example
+# Copy this file to vault.yml and encrypt it with:
+# ansible-vault encrypt inventories/group_vars/all/vault.yml
+
+# Example secrets (replace with your actual secrets)
+vault_example_database_password: "changeme"
+vault_example_api_token: "your-token-here"
+vault_example_ssh_private_key: |
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  your-key-content-here
+  -----END OPENSSH PRIVATE KEY-----
+
+# Usage in playbooks:
+# - name: Use vault variable
+#   vars:
+#     db_password: "{{ vault_example_database_password }}"

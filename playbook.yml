@@ -1,0 +1,20 @@
+---
+- name: Set up host machine
+  hosts: vbox
+  # connection: local
+  gather_facts: true
+
+  roles:
+    - role: fonts
+      tags: fonts
+    - role: utilities
+      tags: utilities
+    - role: nvim
+      tags: nvim
+    - role: zsh
+      tags: zsh
+    - role: bootstrap
+      tags: bootstrap
+    - role: hardening
+      become: true
+      tags: hardening

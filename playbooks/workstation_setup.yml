@@ -1,0 +1,70 @@
+---
+# Workstation Setup Playbook
+# Installs development tools, CLI utilities, and configures shell environment
+
+- name: Configure Development Workstation
+  hosts: workstations
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display environment information
+      ansible.builtin.debug:
+        msg: |
+          Setting up workstation: {{ inventory_hostname }}
+          Environment: {{ environment_name | default('unknown') }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+
+    - name: Ensure target is in workstations group
+      ansible.builtin.assert:
+        that:
+          - "'workstations' in group_names or inventory_hostname == 'localhost'"
+        fail_msg: "This playbook should only run on workstations"
+        success_msg: "Target validated as workstation"
+
+    - name: Check if running as root
+      ansible.builtin.fail:
+        msg: "Do not run this playbook as root. Use --ask-become-pass for privilege escalation."
+      when: ansible_user_id == 'root'
+
+  roles:
+    - role: fonts
+      tags: ['fonts', 'nerdfonts']
+      when: install_fonts | default(true)
+
+    - role: utilities
+      tags: ['utilities', 'cli-tools']
+      when: install_utilities | default(true)
+
+    - role: nvim
+      tags: ['nvim', 'editor', 'astronvim']
+      when: install_astronvim | default(true)
+
+    - role: zsh
+      tags: ['zsh', 'shell']
+      when: install_zsh | default(true)
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Workstation setup completed!
+          ========================================
+
+          Installed components:
+          - Fonts: {{ 'Yes' if install_fonts | default(true) else 'No' }}
+          - CLI Utilities: {{ 'Yes' if install_utilities | default(true) else 'No' }}
+          - Neovim/AstroVim: {{ 'Yes' if install_astronvim | default(true) else 'No' }}
+          - ZSH: {{ 'Yes' if install_zsh | default(true) else 'No' }}
+
+          Next steps:
+          1. Restart your terminal or run: source ~/.zshrc
+          2. Test nvim: nvim
+          3. Enjoy your configured workstation!
+          ========================================
+
+    - name: Remind about shell change
+      ansible.builtin.debug:
+        msg: "⚠️  If ZSH was installed, logout and login again for shell changes to take effect."
+      when: install_zsh | default(true)

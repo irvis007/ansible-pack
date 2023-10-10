@@ -1,0 +1,57 @@
+### Ansible ###
+*.retry
+.idea
+
+# Inventory files (may contain sensitive IPs/hostnames)
+inventory.ini
+inventories/hosts.yml
+!inventories/hosts.yml.example
+
+# Vault files (encrypted secrets)
+**/vault.yml
+!**/vault.yml.example
+
+# Host-specific variables (may contain sensitive data)
+inventories/host_vars/*/
+
+# Logs
+*.log
+ansible.log
+
+# Cached facts
+.ansible/
+/tmp/ansible_facts_cache/
+/tmp/ansible_inventory_cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.molecule/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SSH Keys (just in case)
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+!roles/*/files/*.pub  # Allow role files if needed
