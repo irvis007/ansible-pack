@@ -1,18 +1,41 @@
-#need to ensure fonts are installed system-wide
-- name: ensure fonts directory
-  file:
-    path: "{{ lookup('env', 'HOME') }}/.fonts"
-    state: directory
+---
+- name: '[debian] Include Debian-specific variables'
+  include_vars: debian.yml
+  tags: nerdfonts
 
-- name: EnvyCodeR exists 
-  shell: "ls {{ lookup('env', 'HOME') }}/.fonts/EnvyCodeR"
-  register: envy_exists
-  ignore_errors: yes
+- name: '[debian] Setting nerdfonts_install_dir for system-wide installation'
+  set_fact:
+    nerdfonts_install_dir: "{{ nerdfonts_deb_fonts_sys_dir }}"
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: '[debian] Create NerdFonts folder for system-wide installation'
+  file:
+    path: "{{ nerdfonts_install_dir }}/NerdFonts"
+    state: directory
+  become: yes
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
+
+- name: 'Create EnvyCodeR folder'
+  file:
+    path: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"
+    state: directory
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
 
 - name: Download EnvyCodeNerdFont
-  when: envy_exists is failed
   ansible.builtin.unarchive:
     src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/EnvyCodeR.zip
-    dest: "{{ lookup('env', 'HOME') }}/.fonts/"
+    dest: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"
     remote_src: yes
+  when:
+  - nerdfonts_deb_env is defined
+  tags: nerdfonts
 
+- name: '[debian] Update the Fonts Cache'
+  command: "fc-cache -fv" 
+  tags: nerdfonts
