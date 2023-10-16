@@ -1,0 +1,66 @@
+---
+- name: '[nvim] Install you complete me dependencies'
+  ansible.builtin.package: name={{ item }} state=present
+  with_items: 
+    - build-essential
+    - cmake
+  tags:
+    - nvim
+
+# Install nvim with snap
+- name: '[nvim] Install neovim with snap package manager'
+  community.general.snap:
+    name: nvim
+    classic: yes
+  tags:
+    - nvim
+
+# post install config
+
+# AstroVim
+- name: Install AstroVim dependencie
+  ansible.builtin.package: name={{ item }} state=present
+  with_items:
+    - nodejs
+    - npm
+    - terminator
+    - rigrep
+    - gdu
+    - python
+  tags:
+    - nvim
+
+- name: Install "tree-sitter-cli" node.js package globally.
+  community.general.npm:
+    name: tree-sitter-cli
+    global: true
+  tags:
+    - nvim
+
+- name: 'Install lazy-git'
+   shell:
+    cmd: |
+      LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+      curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+      tar xf lazygit.tar.gz lazygit
+      sudo install lazygit /usr/local/bin
+
+
+- name: 'Install bottom' 
+   shell:
+    cmd: |
+      curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_0.9.6_amd64.deb
+      sudo dpkg -i bottom_0.9.6_amd64.deb
+
+- name: 'Install AstroVim' 
+  ansible.builtin.git:
+    repo: https://github.com/AstroNvim/AstroNvim 
+    dest: ~/.config/nvim
+    depth: 1
+
+ 
+# - name: 'Restore custom set up' 
+#   ansible.builtin.git:
+#     repo: https://github.com/AstroNvim/AstroNvim 
+#     dest: ~/.config/nvim
+#     depth: 1

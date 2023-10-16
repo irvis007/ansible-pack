@@ -14,12 +14,11 @@
   file:
     path: "{{ nerdfonts_install_dir }}/NerdFonts"
     state: directory
-  become: yes
   when:
   - nerdfonts_deb_env is defined
   tags: nerdfonts
 
-- name: 'Create EnvyCodeR folder'
+- name: '[debian] Create EnvyCodeR folder'
   file:
     path: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"
     state: directory
@@ -27,7 +26,7 @@
   - nerdfonts_deb_env is defined
   tags: nerdfonts
 
-- name: Download EnvyCodeNerdFont
+- name: '[debian] Download EnvyCodeNerdFont'
   ansible.builtin.unarchive:
     src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/EnvyCodeR.zip
     dest: "{{ nerdfonts_install_dir }}/NerdFonts/EnvyCodeR"

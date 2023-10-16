@@ -10,3 +10,5 @@
       tags: fonts
     - role: utilities
       tags: utilities
+    - role: nvim 
+      tags: nvim
