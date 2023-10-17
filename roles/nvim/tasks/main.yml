@@ -22,7 +22,7 @@
 # post install config
 
 # AstroVim
-- name: Install AstroVim dependencies
+- name: '[AstroVim] Install dependencies'
   ansible.builtin.package: name={{ item }} state=present
   with_items:
     - nodejs
@@ -35,14 +35,14 @@
   tags:
     - nvim
 
-- name: Install "tree-sitter-cli" node.js package globally.
+- name: '[AstroVim] Install "tree-sitter-cli" node.js package globally.Install "tree-sitter-cli" node.js package globally'
   community.general.npm:
     name: tree-sitter-cli
     global: true
   tags:
     - nvim
 
-- name: 'Install lazy-git globally'
+- name: '[AstroVim] Install lazy-git globally'
   shell:
    cmd: |
      LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
@@ -53,7 +53,7 @@
     - nvim
 
 
-- name: 'Install bottom' 
+- name: '[AstroVim] Install bottom' 
   shell:
    cmd: |
      curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_0.9.6_amd64.deb
@@ -61,7 +61,7 @@
   tags:
     - nvim
 
-- name: 'Install AstroVim for user {{ astro_vim_local_user }}' 
+- name: '[AstroVim] Install AstroVim for user {{ astro_vim_local_user }}' 
   ansible.builtin.git:
     repo: https://github.com/AstroNvim/AstroNvim 
     dest: /home/{{ astro_vim_local_user }}/.config/nvim
@@ -70,7 +70,7 @@
     - nvim
 
  
-- name: 'Restore custom set up for AstroVim' 
+- name: '[AstroVim] Restore custom set up' 
   ansible.builtin.git:
     repo: https://github.com/irvis007/astroVim_config.git 
     dest: /home/{{ astro_vim_local_user }}/.config/nvim/lua/user

@@ -1,0 +1,15 @@
+---
+
+- name: '[zsh] Install zsh' 
+  ansible.builtin.package: name={{ item }} state=present
+  with_items: 
+    - zsh
+  tags:
+    - zsh
+
+- name: '[zsh] Install oh-my-zsh'
+  shell:
+    cmd: |
+      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  tags:
+    - zsh
