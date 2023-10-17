@@ -1,5 +1,9 @@
 ---
-- name: '[nvim] Install you complete me dependencies'
+- name: '[nvim] Include user-specific variables'
+  include_vars: vars.yml
+  tags: nvim 
+
+- name: '[nvim] Install "you complete me" dependencies'
   ansible.builtin.package: name={{ item }} state=present
   with_items: 
     - build-essential
@@ -18,15 +22,16 @@
 # post install config
 
 # AstroVim
-- name: Install AstroVim dependencie
+- name: Install AstroVim dependencies
   ansible.builtin.package: name={{ item }} state=present
   with_items:
     - nodejs
     - npm
     - terminator
-    - rigrep
     - gdu
-    - python
+    - python3
+    - curl
+    - tar
   tags:
     - nvim
 
@@ -37,30 +42,37 @@
   tags:
     - nvim
 
-- name: 'Install lazy-git'
-   shell:
-    cmd: |
-      LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-      curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-      tar xf lazygit.tar.gz lazygit
-      sudo install lazygit /usr/local/bin
+- name: 'Install lazy-git globally'
+  shell:
+   cmd: |
+     LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+     curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+     tar xf lazygit.tar.gz lazygit
+     sudo install lazygit /usr/local/bin
+  tags:
+    - nvim
 
 
 - name: 'Install bottom' 
-   shell:
-    cmd: |
-      curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_0.9.6_amd64.deb
-      sudo dpkg -i bottom_0.9.6_amd64.deb
+  shell:
+   cmd: |
+     curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_0.9.6_amd64.deb
+     sudo dpkg -i bottom_0.9.6_amd64.deb
+  tags:
+    - nvim
 
-- name: 'Install AstroVim' 
+- name: 'Install AstroVim for user {{ astro_vim_local_user }}' 
   ansible.builtin.git:
     repo: https://github.com/AstroNvim/AstroNvim 
-    dest: ~/.config/nvim
+    dest: /home/{{ astro_vim_local_user }}/.config/nvim
     depth: 1
+  tags:
+    - nvim
 
  
-# - name: 'Restore custom set up' 
-#   ansible.builtin.git:
-#     repo: https://github.com/AstroNvim/AstroNvim 
-#     dest: ~/.config/nvim
-#     depth: 1
+- name: 'Restore custom set up for AstroVim' 
+  ansible.builtin.git:
+    repo: https://github.com/irvis007/astroVim_config.git 
+    dest: /home/{{ astro_vim_local_user }}/.config/nvim/lua/user
+  tags:
+    - nvim
