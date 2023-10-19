@@ -4,6 +4,8 @@
   tags:
     - zsh
 
+
+
 - name: '[zsh] Install zsh' 
   ansible.builtin.package: name={{ item }} state=present
   with_items: 
@@ -11,6 +13,7 @@
   tags:
     - zsh
 
+#TODO need to add flag to skip installation in case .oh-my-zsh exists
 # - name: '[zsh] Install oh-my-zsh'
 #   shell:
 #     cmd: |
@@ -33,5 +36,8 @@
   tags:
     - zsh
       
+# TODO switch to generic user {{user.username}} 
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#vars-and-facts
+# TODO fix zsh config https://stackoverflow.com/questions/67799534/why-are-only-certain-plugins-in-zsh-working-while-others-arent
 # TODO run zsh, install dependencies
 # TODO clean up stuff, like clonned repos
