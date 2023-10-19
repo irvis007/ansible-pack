@@ -22,16 +22,23 @@
 # post install config
 
 # AstroVim
-- name: '[AstroVim] Install dependencies'
+- name: '[AstroVim] Install dependencies with package manager'
   ansible.builtin.package: name={{ item }} state=present
   with_items:
-    - nodejs
-    - npm
     - terminator
     - gdu
     - python3
     - curl
     - tar
+    - git
+  tags:
+    - nvim
+
+# Install nvim with snap
+- name: '[nvim] Install dependencies with snap package manager'
+  community.general.snap:
+    name: node
+    classic: yes
   tags:
     - nvim
 
@@ -69,10 +76,12 @@
   tags:
     - nvim
 
- 
 - name: '[AstroVim] Restore custom set up' 
   ansible.builtin.git:
     repo: https://github.com/irvis007/astroVim_config.git 
     dest: /home/{{ astro_vim_local_user }}/.config/nvim/lua/user
   tags:
     - nvim
+
+
+# TODO clean up stuff, like clonned repos, binaries, etc

@@ -1,4 +1,8 @@
 ---
+- name: '[nvim] Include user-specific variables'
+  include_vars: vars.yml
+  tags:
+    - zsh
 
 - name: '[zsh] Install zsh' 
   ansible.builtin.package: name={{ item }} state=present
@@ -7,9 +11,27 @@
   tags:
     - zsh
 
-- name: '[zsh] Install oh-my-zsh'
-  shell:
-    cmd: |
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# - name: '[zsh] Install oh-my-zsh'
+#   shell:
+#     cmd: |
+#       sh -c "ZSH="/home/{{zsh_vim_local_user}}/.oh-my-zsh" $(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+#   tags:
+#     - zsh
+#
+- name: '[zsh] Fetch user config'
+  ansible.builtin.git:
+    repo: https://github.com/irvis007/zsh-custom-config.git 
+    dest: /tmp/zsh-custom-config/
   tags:
     - zsh
+
+- name: '[zsh] Copy zsh config'
+  copy:
+    remote_src: yes
+    src: /tmp/zsh-custom-config/.zshrc
+    dest: /home/{{ zsh_vim_local_user }}/.zshrc
+  tags:
+    - zsh
+      
+# TODO run zsh, install dependencies
+# TODO clean up stuff, like clonned repos

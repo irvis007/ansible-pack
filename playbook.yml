@@ -12,3 +12,5 @@
       tags: utilities
     - role: nvim 
       tags: nvim
+    - role: zsh 
+      tags: zsh
