@@ -3,13 +3,7 @@
   include_vars: vars.yml
   tags: nvim 
 
-- name: '[nvim] Install "you complete me" dependencies'
-  ansible.builtin.package: name={{ item }} state=present
-  with_items: 
-    - build-essential
-    - cmake
-  tags:
-    - nvim
+# >>> main part of installation <<<
 
 # Install nvim with snap
 - name: '[nvim] Install neovim with snap package manager'
@@ -19,7 +13,16 @@
   tags:
     - nvim
 
-# post install config
+# >>> post install config <<<
+
+# Install nvim dependencies
+- name: '[nvim] Install "you complete me" dependencies'
+  ansible.builtin.package: name={{ item }} state=present
+  with_items: 
+    - build-essential
+    - cmake
+  tags:
+    - nvim
 
 # AstroVim
 - name: '[AstroVim] Install dependencies with package manager'
@@ -34,7 +37,7 @@
   tags:
     - nvim
 
-# Install nvim with snap
+# Install nvim dependencies
 - name: '[nvim] Install dependencies with snap package manager'
   community.general.snap:
     name: node
@@ -68,20 +71,13 @@
   tags:
     - nvim
 
-- name: '[AstroVim] Install AstroVim for user {{ astro_vim_local_user }}' 
+- name: '[AstroVim] Install AstroVim for user {{ astro_vim_local_user }}, this step copies user config as well' 
   ansible.builtin.git:
-    repo: https://github.com/AstroNvim/AstroNvim 
+    repo: https://github.com/irvis007/astroVim-v4.git 
     dest: /home/{{ astro_vim_local_user }}/.config/nvim
     depth: 1
   tags:
     - nvim
 
-- name: '[AstroVim] Restore custom set up' 
-  ansible.builtin.git:
-    repo: https://github.com/irvis007/astroVim_config.git 
-    dest: /home/{{ astro_vim_local_user }}/.config/nvim/lua/user
-  tags:
-    - nvim
-
-
 # TODO clean up stuff, like clonned repos, binaries, etc
+# TODO get rid of snap package manager

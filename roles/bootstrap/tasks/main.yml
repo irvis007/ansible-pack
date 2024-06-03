@@ -1,0 +1,28 @@
+---
+- name: create group for Ansible executions
+  ansible.builtin.group:
+    name: ansible
+    state: present
+  tags: bootstrap
+
+- name: create user for Ansible executions
+  ansible.builtin.user:
+    name: ansible
+    group: ansible
+    shell: /bin/bash
+    home: /home/ansible
+    state: present
+  tags: bootstrap
+
+- name: Add ssh key for ansible user
+  ansible.builtin.authorized_key:
+    user: ansible
+    key: "{{ lookup('file', '/home/lblazejowski/.ssh/ansibleKey.pub') }}"
+  tags: bootstrap
+
+- name: sudo without password for ansible group
+  copy:
+    content: '%ansible ALL=(ALL:ALL) NOPASSWD:ALL'
+    dest: /etc/sudoers.d/ansible_nopasswd
+    mode: 0440
+  tags: bootstrap

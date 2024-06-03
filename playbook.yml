@@ -14,3 +14,5 @@
       tags: nvim
     - role: zsh 
       tags: zsh
+    - role: bootstrap
+      tags: bootstrap
