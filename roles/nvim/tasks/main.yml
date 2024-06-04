@@ -3,17 +3,13 @@
   include_vars: vars.yml
   tags: nvim 
 
-# >>> main part of installation <<<
+- name: Update apt Cache
+  ansible.builtin.package: 
+      update_cache: yes
+      force_apt_get: yes
 
-# Install nvim with snap
-- name: '[nvim] Install neovim with snap package manager'
-  community.general.snap:
-    name: nvim
-    classic: yes
-  tags:
-    - nvim
-
-# >>> post install config <<<
+- name: Wait for APT Lock
+  ansible.builtin.shell:  while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
 # Install nvim dependencies
 - name: '[nvim] Install "you complete me" dependencies'
@@ -24,7 +20,23 @@
   tags:
     - nvim
 
-# AstroVim
+- name: '[nvim] Install dependencies with snap package manager'
+  community.general.snap:
+    name: node
+    classic: yes
+  tags:
+    - nvim
+
+
+# Install nvim with snap
+- name: '[nvim] Install neovim with snap package manager'
+  community.general.snap:
+    name: nvim
+    classic: yes
+  tags:
+    - nvim
+
+# Install AstroVim dependencies
 - name: '[AstroVim] Install dependencies with package manager'
   ansible.builtin.package: name={{ item }} state=present
   with_items:
@@ -37,11 +49,13 @@
   tags:
     - nvim
 
-# Install nvim dependencies
-- name: '[nvim] Install dependencies with snap package manager'
-  community.general.snap:
-    name: node
-    classic: yes
+- name: '[AstroVim] Install lazy-git globally'
+  shell:
+   cmd: |
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    sudo install lazygit /usr/local/bin
   tags:
     - nvim
 
@@ -52,26 +66,10 @@
   tags:
     - nvim
 
-- name: '[AstroVim] Install lazy-git globally'
-  shell:
-   cmd: |
-     LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-     curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-     tar xf lazygit.tar.gz lazygit
-     sudo install lazygit /usr/local/bin
-  tags:
-    - nvim
-
-
-- name: '[AstroVim] Install bottom' 
-  shell:
-   cmd: |
-     curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_0.9.6_amd64.deb
-     sudo dpkg -i bottom_0.9.6_amd64.deb
-  tags:
-    - nvim
-
+## restore AstroVim config
 - name: '[AstroVim] Install AstroVim for user {{ astro_vim_local_user }}, this step copies user config as well' 
+  become: true
+  become_user: '{{ astro_vim_local_user }}'
   ansible.builtin.git:
     repo: https://github.com/irvis007/astroVim-v4.git 
     dest: /home/{{ astro_vim_local_user }}/.config/nvim
@@ -79,5 +77,15 @@
   tags:
     - nvim
 
+# - name: 'AstroVim ensure AstroVim config is having right ownership: {{ astro_vim_local_user }} '
+#   ansible.builtin.file:
+#     path: /home/{{ astro_vim_local_user }}/.config/nvim
+#     state: directory
+#     recurse: yes
+#     owner: '{{ astro_vim_local_user }}'
+#     group: '{{ astro_vim_local_user }}'
+#   tags:
+#     - nvim
+#
 # TODO clean up stuff, like clonned repos, binaries, etc
 # TODO get rid of snap package manager
