@@ -46,6 +46,8 @@
     - curl
     - tar
     - git
+    - fd-find
+    - ripgrep
   tags:
     - nvim
 
