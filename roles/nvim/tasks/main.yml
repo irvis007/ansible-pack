@@ -1,4 +1,7 @@
 ---
+# include tasks to set install node in the system
+- import_tasks: nodejs.yml
+
 - name: '[nvim] Include user-specific variables'
   include_vars: vars.yml
   tags: nvim 
@@ -7,9 +10,14 @@
   ansible.builtin.package: 
       update_cache: yes
       force_apt_get: yes
+  tags:
+    - nvim
 
+# case when you have ie unattended upgrade enabled
 - name: Wait for APT Lock
   ansible.builtin.shell:  while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+  tags:
+    - nvim
 
 # Install nvim dependencies
 - name: '[nvim] Install "you complete me" dependencies'
@@ -19,14 +27,6 @@
     - cmake
   tags:
     - nvim
-
-- name: '[nvim] Install dependencies with snap package manager'
-  community.general.snap:
-    name: node
-    classic: yes
-  tags:
-    - nvim
-
 
 # Install nvim with snap
 - name: '[nvim] Install neovim with snap package manager'
@@ -42,8 +42,6 @@
   with_items:
     - terminator
     - gdu
-    - python3
-    - curl
     - tar
     - git
     - fd-find
@@ -79,15 +77,8 @@
   tags:
     - nvim
 
-# - name: 'AstroVim ensure AstroVim config is having right ownership: {{ astro_vim_local_user }} '
-#   ansible.builtin.file:
-#     path: /home/{{ astro_vim_local_user }}/.config/nvim
-#     state: directory
-#     recurse: yes
-#     owner: '{{ astro_vim_local_user }}'
-#     group: '{{ astro_vim_local_user }}'
-#   tags:
-#     - nvim
-#
-# TODO clean up stuff, like clonned repos, binaries, etc
-# TODO get rid of snap package manager
+# Initialize AstroNvim
+- name: '[AstroNvim] initialize AstroNvim'
+  become: true
+  become_user: '{{ astro_vim_local_user }}' 
+  ansible.builtin.shell: nvim --headless -c 'quitall'
