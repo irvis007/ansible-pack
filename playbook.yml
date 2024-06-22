@@ -1,7 +1,8 @@
 ---
 
 - name: Set up host machine
-  hosts: vbox
+  hosts: localhost
+  connection: local
   become: yes
   gather_facts: yes
 

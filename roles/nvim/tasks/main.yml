@@ -1,5 +1,6 @@
 ---
 # include tasks to set install node in the system
+- import_tasks: setup-debian.yml
 - import_tasks: nodejs.yml
 
 - name: '[nvim] Include user-specific variables'
