@@ -5,6 +5,7 @@
   when: nodejs_install_npm_user is not defined
 
 - name: Create npm global directory
+  become: true
   file:
     path: "{{ npm_config_prefix }}"
     owner: "{{ nodejs_install_npm_user }}"

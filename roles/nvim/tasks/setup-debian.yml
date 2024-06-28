@@ -16,7 +16,7 @@
     dest: /etc/apt/signing-key-nodesource-repo.asc
     owner: root
     group: root
-    mode: '0444'
+    mode: "0444"
   register: node_signing_key
 
 - name: Add NodeSource repositories for Node.js.
@@ -31,11 +31,13 @@
   register: node_repo
 
 - name: Update apt cache if repo was added.
+  become: true
   ansible.builtin.apt: update_cache=yes
   when: node_repo is changed
-  tags: ['skip_ansible_lint']
+  tags: ["skip_ansible_lint"]
 
 - name: Ensure Node.js and npm are installed.
+  become: true
   ansible.builtin.apt:
     name: "nodejs={{ nodejs_version | regex_replace('x', '') }}*"
     state: present

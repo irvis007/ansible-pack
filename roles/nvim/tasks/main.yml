@@ -8,6 +8,7 @@
   tags: nvim
 
 - name: Update apt Cache
+  become: true
   ansible.builtin.package:
     update_cache: yes
     force_apt_get: yes
@@ -68,7 +69,7 @@
     - nvim
 
 ## restore AstroVim config
-- name: "[AstroVim] Install AstroVim for user {{ astro_vim_local_user }}, this step copies user config as well"
+- name: "[AstroVim] Install AstroVim for user, this step copies user config as well"
   ansible.builtin.git:
     repo: https://github.com/irvis007/astroVim-v4.git
     dest: ~/.config/nvim
