@@ -1,19 +1,17 @@
 ---
-
 - name: Set up host machine
-  hosts: localhost
-  connection: local
-  become: yes
-  gather_facts: yes
+  hosts: vbox
+  # become: true
+  gather_facts: true
 
   roles:
     - role: fonts
       tags: fonts
     - role: utilities
       tags: utilities
-    - role: nvim 
+    - role: nvim
       tags: nvim
-    - role: zsh 
+    - role: zsh
       tags: zsh
     - role: bootstrap
       tags: bootstrap

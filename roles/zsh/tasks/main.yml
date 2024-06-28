@@ -1,43 +1,55 @@
----
-- name: '[nvim] Include user-specific variables'
-  include_vars: vars.yml
-  tags:
-    - zsh
+- name: Install ZSH
+  become: true
+  ansible.builtin.package:
+    name: zsh
+    state: present
 
+- name: Override powerline fonts package name for Debian.
+  ansible.builtin.set_fact:
+    powerlinefonts: fonts-powerline
+  when: ansible_os_family == 'Debian'
 
+- name: Install Powerline fonts
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: "{{ powerlinefonts }}"
 
-- name: '[zsh] Install zsh' 
-  ansible.builtin.package: name={{ item }} state=present
-  with_items: 
-    - zsh
-  tags:
-    - zsh
-
-#TODO need to add flag to skip installation in case .oh-my-zsh exists
-# - name: '[zsh] Install oh-my-zsh'
-#   shell:
-#     cmd: |
-#       sh -c "ZSH="/home/{{zsh_vim_local_user}}/.oh-my-zsh" $(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-#   tags:
-#     - zsh
-#
-- name: '[zsh] Fetch user config'
+- name: Install Oh My Zsh
   ansible.builtin.git:
-    repo: https://github.com/irvis007/zsh-custom-config.git 
-    dest: /tmp/zsh-custom-config/
-  tags:
-    - zsh
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: ~/.oh-my-zsh
+    depth: 1
 
-- name: '[zsh] Copy zsh config'
-  copy:
-    remote_src: yes
-    src: /tmp/zsh-custom-config/.zshrc
-    dest: /home/{{ zsh_vim_local_user }}/.zshrc
-  tags:
-    - zsh
-      
-# TODO switch to generic user {{user.username}} 
-# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#vars-and-facts
-# TODO fix zsh config https://stackoverflow.com/questions/67799534/why-are-only-certain-plugins-in-zsh-working-while-others-arent
-# TODO run zsh, install dependencies
-# TODO clean up stuff, like clonned repos
+- name: Install zsh-autosuggestions plugin # noqa: latest
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+    depth: 1
+
+- name: Install zsh-completions plugin # noqa: latest
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-completions
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
+    depth: 1
+
+- name: Install zsh-syntax-highlighting plugin # noqa: latest
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+    depth: 1
+
+- name: Install autoupdate-zsh-plugin # noqa: latest
+  ansible.builtin.git:
+    repo: https://github.com/TamCore/autoupdate-oh-my-zsh-plugins
+    dest: ~/.oh-my-zsh/custom/plugins/autoupdate
+    depth: 1
+
+- name: Change user ({{ zsh_local_user }}) shell to zsh
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh
+
+- name: Tasks for p10k
+  ansible.builtin.include_tasks: p10k.yml

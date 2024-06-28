@@ -1,2 +1,3 @@
 ---
-zsh_vim_local_user: 'vboxuser'
+copy_dot_files: true
+powerlinefonts: powerline-fonts
