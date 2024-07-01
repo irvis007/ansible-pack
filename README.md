@@ -16,7 +16,7 @@ install:
 - security apps
   - fail2ban
   - ufw
-- harden OS
+- harden OS through automation
 - harden components
 - IDS/IPS
 
