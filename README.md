@@ -18,7 +18,7 @@ install:
   - ufw
 - harden OS
 - harden components
-- IDS
+- IDS/IPS
 
 # common
 
