@@ -1,7 +1,7 @@
 ---
 - name: Define nodejs_install_npm_user
   set_fact:
-    nodejs_install_npm_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    nodejs_install_npm_user: ukasz
   when: nodejs_install_npm_user is not defined
 
 - name: Create npm global directory
@@ -14,6 +14,7 @@
     mode: 0755
 
 - name: Add npm_config_prefix bin directory to global $PATH.
+  become: true
   template:
     src: npm.sh.j2
     dest: /etc/profile.d/npm.sh
@@ -21,6 +22,7 @@
   when: nodejs_generate_etc_profile
 
 - name: Ensure npm global packages are installed.
+  become: true
   npm:
     name: "{{ item.name | default(item) }}"
     version: "{{ item.version | default(omit) }}"
@@ -33,6 +35,7 @@
   with_items: "{{ nodejs_npm_global_packages }}"
 
 - name: Install packages defined in a given package.json.
+  become: true
   npm:
     path: "{{ nodejs_package_json_path }}"
   when: nodejs_package_json_path is defined and nodejs_package_json_path

@@ -1,7 +1,7 @@
 ---
 - name: Set up host machine
-  hosts: vbox
-  # become: true
+  hosts: localhost
+  connection: local
   gather_facts: true
 
   roles:

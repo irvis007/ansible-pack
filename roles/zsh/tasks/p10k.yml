@@ -1,4 +1,6 @@
 # tasks file for p10k
+- name: include vars
+  include_vars: vars.yml
 
 - name: Install Powerline10k theme # noqa: latest
   ansible.builtin.git:

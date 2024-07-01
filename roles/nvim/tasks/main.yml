@@ -23,6 +23,7 @@
 
 # Install nvim dependencies
 - name: '[nvim] Install "you complete me" dependencies'
+  become: true
   ansible.builtin.package: name={{ item }} state=present
   with_items:
     - build-essential
@@ -32,6 +33,7 @@
 
 # Install nvim with snap
 - name: "[nvim] Install neovim with snap package manager"
+  become: true
   community.general.snap:
     name: nvim
     classic: yes
@@ -40,6 +42,7 @@
 
 # Install AstroVim dependencies
 - name: "[AstroVim] Install dependencies with package manager"
+  become: true
   ansible.builtin.package: name={{ item }} state=present
   with_items:
     - terminator
@@ -52,6 +55,7 @@
     - nvim
 
 - name: "[AstroVim] Install lazy-git globally"
+  become: true
   shell:
     cmd: |
       LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
@@ -62,6 +66,7 @@
     - nvim
 
 - name: '[AstroVim] Install "tree-sitter-cli" node.js package globally.Install "tree-sitter-cli" node.js package globally'
+  become: true
   community.general.npm:
     name: tree-sitter-cli
     global: true
