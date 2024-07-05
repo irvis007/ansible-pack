@@ -13,7 +13,7 @@ install:
 
 install:
 
-- security apps
+- security apps (with configuration)
   - fail2ban
   - ufw
 - harden OS through automation
@@ -28,3 +28,13 @@ Sources:
 
 - https://github.com/geerlingguy/ansible-role-nodejs/blob/master/tasks/main.yml
 - https://github.com/LorenzoBettini/ansible-molecule-oh-my-zsh-example
+
+# comments
+
+to use only one specific role, use tags:
+`ansible-playbook playbook.yml --tags "hardening" -i inventory.ini --ask-become`
+
+# requierenments:
+
+- Requires Ansible >=2.9.10
+- using roles listed in `meta/requierenments`, need to run `ansible-galaxy install -r meta/requirements.yml` do install them locally

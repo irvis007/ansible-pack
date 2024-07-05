@@ -1,7 +1,7 @@
 ---
 - name: Set up host machine
-  hosts: localhost
-  connection: local
+  hosts: vbox
+  # connection: local
   gather_facts: true
 
   roles:
@@ -15,3 +15,6 @@
       tags: zsh
     - role: bootstrap
       tags: bootstrap
+    - role: hardening
+      become: true
+      tags: hardening
