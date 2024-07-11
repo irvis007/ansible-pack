@@ -19,6 +19,7 @@ install:
 - harden OS through automation
 - harden components
 - IDS/IPS
+- change ssh port
 
 # common
 

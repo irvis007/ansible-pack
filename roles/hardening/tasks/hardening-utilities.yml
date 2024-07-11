@@ -1,5 +1,60 @@
 ---
-# fail2ban
-# ufw
 # unatendetupdates
 # suricata vs snort
+
+# fail2ban
+- name: Install fail2ban with package manager
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: fail2ban
+
+- name: update configuration file - /etc/fail2ban/fail2ban.local
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart fail2ban
+
+- name: start and enable fail2ban service
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
+
+# ufw
+- name: Install UFW with package manager
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: ufw
+
+- name: enable UFW
+  community.general.ufw:
+    state: enabled
+
+- name: set logging
+  community.general.ufw:
+    logging: "on"
+
+- name: allow all access to tcp port 80
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - "80"
+    - "443"
+    - "65522" #set up your own high SSH random port,
+    - "22" # definitely remove that when above set up
+
+- name: block ipv6
+  community.general.ufw:
+    rule: deny
+    proto: ipv6
+    direction: "{{ item }}"
+  loop:
+    - in
+    - out
