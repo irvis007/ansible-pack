@@ -6,3 +6,4 @@ roles:
 
 collections:
   - name: devsec.hardening
+  - name: hifis.toolkit

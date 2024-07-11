@@ -1,5 +1,7 @@
 ---
-- import_tasks: hardening-utilities.yml
+- import_tasks: fail2ban.yml
+- import_tasks: ufw.yml
+- import_tasks: updates.yml
 # - name: harden ssh role
 #   ansible.builtin.include_role:
 #     name: devsec.hardening.ssh_hardening
@@ -27,5 +29,5 @@
 #
 # - name: install ClamAV
 #   ansible.builtin.include_role:
-#     role: geerlingguy.clamav
+#     role: geerlingguy.clama#   tags: hardening
 #   tags: hardening
