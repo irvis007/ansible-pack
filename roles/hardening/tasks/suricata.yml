@@ -1,0 +1,45 @@
+---
+- name: add suricata repository from PPA and install its signing key on Ubuntu target
+  ansible.builtin.apt_repository:
+    repo: ppa:oisf/suricata-stable
+    state: present
+
+- name: install suricata
+  become: true
+  ansible.builtin.package:
+    name: suricata
+    state: present
+
+- name: start and enable suricata service
+  ansible.biuitin.service:
+    name: suricata
+    state: started
+    enabled: true
+
+- name: copy suricata init script file
+  template:
+    src: init-suricata.conf
+    dest: /etc/init/suricata.conf
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
+
+# copy config files,
+- name: copy suricata.yaml config files
+  template:
+    src: suricata.yaml.j2
+    dest: /etc/suricata/suricata.yaml
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
+
+- name: sopy local rules file
+  template:
+    src: local.rules.j2
+    dest: "{{ suricata_rules_dir }}/local.rules"
+    owner: root
+    group: root
+    mode: 0660
+    backup: yes

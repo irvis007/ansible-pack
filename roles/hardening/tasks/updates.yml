@@ -1,6 +1,5 @@
 ---
 # unatendetupdates
-# suricata vs snort
 
 - name: install unattended upgrades
   ansible.builtin.include_role:

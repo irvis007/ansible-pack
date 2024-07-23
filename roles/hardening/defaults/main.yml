@@ -3,3 +3,4 @@
 fail2ban_bantime: 1w
 fail2ban_findtime: 60m
 fail2ban_maxretry: 3
+suricata_local_rules: []
