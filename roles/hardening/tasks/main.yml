@@ -1,7 +1,8 @@
 ---
-- import_tasks: fail2ban.yml
-- import_tasks: ufw.yml
-- import_tasks: updates.yml
+# - import_tasks: fail2ban.yml
+# - import_tasks: ufw.yml
+# - import_tasks: updates.yml
+- import_tasks: suricata.yml
 # - name: harden ssh role
 #   ansible.builtin.include_role:
 #     name: devsec.hardening.ssh_hardening

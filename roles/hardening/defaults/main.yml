@@ -3,4 +3,8 @@
 fail2ban_bantime: 1w
 fail2ban_findtime: 60m
 fail2ban_maxretry: 3
+### suricata
 suricata_local_rules: []
+suricata_rules_dir: /etc/suricata/rules/
+suricata_log_dir_certs: /var/log/suricata/certs/
+suricata_log_dir: /var/log/suricata/files/

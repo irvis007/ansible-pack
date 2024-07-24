@@ -1,0 +1,10 @@
+[Unit]
+Description=Suricata Timer
+
+[Timer]
+OnCalendar=*-*-* 00:15:30    # Trigger on Sunday at 14:00
+Persistent=true
+StopWhenUnneeded=yes
+
+[Install]
+WantedBy=timers.target

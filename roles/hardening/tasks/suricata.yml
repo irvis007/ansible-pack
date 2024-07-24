@@ -10,8 +10,18 @@
     name: suricata
     state: present
 
+- name: "ensures requiered dirs exists: /etc/init; {{ suricata_log_dir }}; {{ suricata_log_dir_certs }}; {{ suricata_rules_dir }}"
+  file:
+    path: "{ { item } }"
+    state: directory
+  loop:
+    - "/etc/init"
+    - "{{ suricata_log_dir }}"
+    - "{{ suricata_log_dir_certs }}"
+    - "{{ suricata_rules_dir }}"
+
 - name: start and enable suricata service
-  ansible.biuitin.service:
+  ansible.builtin.service:
     name: suricata
     state: started
     enabled: true
@@ -24,6 +34,7 @@
     owner: root
     group: root
     backup: yes
+    force: true
 
 # copy config files,
 - name: copy suricata.yaml config files
@@ -34,8 +45,9 @@
     owner: root
     group: root
     backup: yes
+    force: true
 
-- name: sopy local rules file
+- name: copy local rules file
   template:
     src: local.rules.j2
     dest: "{{ suricata_rules_dir }}/local.rules"
@@ -43,3 +55,19 @@
     group: root
     mode: 0660
     backup: yes
+    force: true
+
+- name: set up suricata rules update timer
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/systemd/system/
+  loop:
+    - suricata.timer
+    - suricata.target
+    - suricata-update.service
+
+- name: start and enable suricata-update service
+  ansible.builtin.service:
+    name: suricata-update
+    state: started
+    enabled: true
