@@ -113,3 +113,9 @@
 #     name: zoxide
 #
 #   when: ansible_os_family != 'Debian' or ansible_distribution_version is version('20.10', '>=')
+
+- name: Install tmux
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: tmux

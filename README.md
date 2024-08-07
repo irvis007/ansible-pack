@@ -29,6 +29,8 @@ Sources:
 
 - https://github.com/geerlingguy/ansible-role-nodejs/blob/master/tasks/main.yml
 - https://github.com/LorenzoBettini/ansible-molecule-oh-my-zsh-example
+- https://github.com/Alir3z4/ansible-suricata
+- https://github.com/PaoloL/ansible-suricata
 
 # comments
 
