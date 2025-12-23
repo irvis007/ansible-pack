@@ -54,14 +54,69 @@
   tags:
     - nvim
 
-- name: "[AstroVim] Install lazy-git globally"
+- name: "[AstroVim] Get latest lazygit release info"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+    return_content: true
+    body_format: json
+  register: lazygit_release
+  tags:
+    - nvim
+
+- name: "[AstroVim] Set lazygit version"
+  ansible.builtin.set_fact:
+    lazygit_version: "{{ lazygit_release.json.tag_name | regex_replace('^v', '') }}"
+  tags:
+    - nvim
+
+- name: "[AstroVim] Check if lazygit is already installed"
+  ansible.builtin.command: lazygit --version
+  register: lazygit_installed
+  changed_when: false
+  failed_when: false
+  tags:
+    - nvim
+
+- name: "[AstroVim] Download lazygit"
+  ansible.builtin.get_url:
+    url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+    dest: "/tmp/lazygit.tar.gz"
+    mode: '0644'
   become: true
-  shell:
-    cmd: |
-      LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-      curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-      tar xf lazygit.tar.gz lazygit
-      sudo install lazygit /usr/local/bin
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Extract lazygit"
+  ansible.builtin.unarchive:
+    src: "/tmp/lazygit.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Install lazygit globally"
+  ansible.builtin.copy:
+    src: "/tmp/lazygit"
+    dest: "/usr/local/bin/lazygit"
+    mode: '0755'
+    remote_src: true
+  become: true
+  when: lazygit_installed.rc != 0
+  tags:
+    - nvim
+
+- name: "[AstroVim] Cleanup lazygit installation files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/lazygit.tar.gz"
+    - "/tmp/lazygit"
+  become: true
+  when: lazygit_installed.rc != 0
   tags:
     - nvim
 

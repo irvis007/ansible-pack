@@ -10,10 +10,14 @@
     name: suricata
     state: present
 
-- name: "ensures requiered dirs exists: /etc/init; {{ suricata_log_dir }}; {{ suricata_log_dir_certs }}; {{ suricata_rules_dir }}"
-  file:
-    path: "{ { item } }"
+- name: "Ensure required directories exist: /etc/init; {{ suricata_log_dir }}; {{ suricata_log_dir_certs }}; {{ suricata_rules_dir }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
     state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
   loop:
     - "/etc/init"
     - "{{ suricata_log_dir }}"
