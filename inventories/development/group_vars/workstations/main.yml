@@ -1,0 +1,23 @@
+---
+# Development Workstations Configuration
+
+# Development Tools
+install_docker: true
+install_astronvim: true
+install_zsh: true
+install_fonts: true
+install_utilities: true
+
+# CLI Tools Configuration
+cli_tools_enabled: true
+
+# Security - Relaxed for Development
+sudo_passwordless_allowed: true  # Easier for local testing
+apply_hardening: false
+ufw_enabled: false
+
+# Package Management
+package_update_cache: true
+
+# Optional: Override SSH key for development
+# ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/dev_key.pub"

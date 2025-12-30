@@ -1,0 +1,26 @@
+---
+# This is an EXAMPLE vault file
+# Copy this to vault.yml and encrypt it with:
+#   ansible-vault encrypt group_vars/all/vault.yml
+#
+# Edit encrypted vault with:
+#   ansible-vault edit group_vars/all/vault.yml
+
+# SSH Keys (store actual key content or paths)
+vault_ansible_ssh_public_key: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... ansible@example.com
+
+# Alternative: Store path if you prefer
+# vault_ansible_ssh_public_key_file: "/path/to/your/ansible_key.pub"
+
+# API Tokens (for future use)
+vault_github_token: ""
+vault_gitlab_token: ""
+
+# Service Credentials (for future use)
+vault_nextcloud_username: ""
+vault_nextcloud_password: ""
+
+# Database Credentials (for future use)
+vault_db_root_password: ""
+vault_db_app_password: ""

@@ -42,53 +42,184 @@ ansible-galaxy role install -r meta/requirements.yml
 
 ### Configuration
 
-1. **Configure variables** in `group_vars/all/common.yml`:
-
-```yaml
-ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key.pub"
-ssh_custom_port: 65522
-```
-
-2. **For production** (optional), create encrypted vault:
+1. **Create your inventory file**:
 
 ```bash
-cp group_vars/all/vault.yml.example group_vars/all/vault.yml
-ansible-vault encrypt group_vars/all/vault.yml
+# For development/testing
+cp inventories/development/hosts.yml.example inventories/development/hosts.yml
+# Edit and add your hosts
+vim inventories/development/hosts.yml
+
+# For production
+cp inventories/production/hosts.yml.example inventories/production/hosts.yml
+vim inventories/production/hosts.yml
+```
+
+2. **Configure variables** in environment-specific `group_vars/`:
+
+```yaml
+# inventories/development/group_vars/all/common.yml
+ansible_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/ansible_key.pub"
+ssh_custom_port: 22  # Default for development
+
+# inventories/production/group_vars/all/common.yml
+ssh_custom_port: 65522  # Custom port for production
+sudo_passwordless_allowed: false  # Require password
+```
+
+3. **For production**, create encrypted vault:
+
+```bash
+cp inventories/production/group_vars/all/vault.yml.example \
+   inventories/production/group_vars/all/vault.yml
+ansible-vault encrypt inventories/production/group_vars/all/vault.yml
 ```
 
 ### Run Playbooks
 
 ```bash
-# Setup workstation (run on localhost or remote)
-ansible-playbook playbook.yml -i inventory.ini --ask-become-pass
+# Development: Setup workstation on localhost
+ansible-playbook playbooks/workstation_setup.yml --ask-become-pass
 
-# Run specific role only
-ansible-playbook playbook.yml --tags "docker" -i inventory.ini --ask-become-pass
+# Development: Setup test server
+ansible-playbook playbooks/server_setup.yml \
+  -i inventories/development/hosts.yml \
+  -l test-server \
+  --ask-become-pass
 
-# Run server hardening
-ansible-playbook playbook.yml --tags "hardening" -i inventory.ini --ask-become-pass
+# Production: Setup workstation
+ansible-playbook playbooks/workstation_setup.yml \
+  -i inventories/production/hosts.yml \
+  -l my-laptop \
+  --ask-become-pass
+
+# Production: Setup server with vault
+ansible-playbook playbooks/server_setup.yml \
+  -i inventories/production/hosts.yml \
+  -l web-prod-01 \
+  --ask-vault-pass \
+  --ask-become-pass
+
+# Run specific components only
+ansible-playbook playbooks/workstation_setup.yml --tags "zsh,nvim"
 ```
 
 ## Repository Structure
 
 ```
 ansible-pack/
-├── group_vars/
+├── inventories/                 # Environment-specific inventories
+│   ├── development/
+│   │   ├── hosts.yml           # Dev hosts (gitignored)
+│   │   ├── hosts.yml.example   # Example template
+│   │   └── group_vars/
+│   │       ├── all/
+│   │       │   ├── common.yml  # Common dev variables
+│   │       │   └── vault.yml.example
+│   │       ├── workstations/
+│   │       │   └── main.yml    # Dev workstation config
+│   │       └── servers/
+│   │           └── main.yml    # Dev server config
+│   ├── production/
+│   │   ├── hosts.yml           # Prod hosts (gitignored)
+│   │   ├── hosts.yml.example
+│   │   └── group_vars/
+│   │       ├── all/
+│   │       ├── workstations/
+│   │       └── servers/
+│   └── README.md               # Inventory documentation
+│
+├── playbooks/                   # All playbooks
+│   ├── workstation_setup.yml   # Workstation configuration
+│   ├── server_setup.yml        # Server hardening & setup
+│   ├── site.yml                # Main entry point
+│   └── README.md               # Playbook documentation
+│
+├── roles/                       # Ansible roles
+│   ├── bootstrap/              # Bootstrap ansible user
+│   ├── fonts/                  # Install Nerd Fonts
+│   ├── hardening/              # Server security hardening
+│   ├── nvim/                   # Neovim + AstroVim
+│   ├── utilities/              # CLI tools
+│   └── zsh/                    # ZSH + Oh-My-Zsh
+│
+├── group_vars/                 # Legacy (moved to inventories/)
 │   └── all/
-│       ├── common.yml           # Common variables
-│       └── vault.yml.example    # Example vault file
-├── roles/
-│   ├── bootstrap/               # Bootstrap ansible user
-│   ├── fonts/                   # Install Nerd Fonts
-│   ├── hardening/               # Server security hardening
-│   ├── nvim/                    # Neovim + AstroVim setup
-│   ├── utilities/               # CLI tools installation
-│   └── zsh/                     # ZSH + Oh-My-Zsh setup
+│       ├── common.yml
+│       └── vault.yml.example
+│
 ├── meta/
-│   └── requirements.yml         # External collections/roles
-├── playbook.yml                 # Main playbook
-├── inventory.ini                # Inventory file (gitignored)
-└── ansible.cfg                  # Ansible configuration
+│   └── requirements.yml        # External collections/roles
+│
+├── ansible.cfg                 # Ansible configuration
+├── .gitignore                  # Git ignore rules
+└── README.md                   # This file
+```
+
+### Directory Explanations
+
+**inventories/**: Environment separation (dev/prod)
+- Each environment has its own hosts and variables
+- Variables cascade: all → groups → hosts
+- Inventory files are gitignored (may contain sensitive IPs)
+
+**playbooks/**: Separate playbooks for different use cases
+- `workstation_setup.yml` - Development machine configuration
+- `server_setup.yml` - Server hardening and setup
+- `site.yml` - Master playbook (runs appropriate playbook per host)
+
+**roles/**: Reusable Ansible roles
+- Each role is self-contained with tasks, templates, handlers
+- Roles can be used across different playbooks
+
+**group_vars/**: Legacy location, now moved to `inventories/*/group_vars/`
+
+## Two-Environment Approach
+
+This repository uses a **development** and **production** environment structure:
+
+### Development Environment
+**Purpose**: Testing, local VMs, development machines
+
+**Characteristics**:
+- Relaxed security (passwordless sudo, no firewall)
+- Default SSH port (22)
+- Verbose logging for debugging
+- No automatic updates
+- SSH password authentication allowed
+
+**Use cases**:
+- Local workstation setup
+- Testing in VMs (VirtualBox, Proxmox, LXD)
+- Learning and experimenting
+- Quick iterations
+
+### Production Environment
+**Purpose**: Real workstations, production servers
+
+**Characteristics**:
+- Strict security (password-required sudo, firewall enabled)
+- Custom SSH port (not 22)
+- Minimal logging
+- Automatic security updates
+- SSH key-only authentication
+- Encrypted secrets via Ansible Vault
+
+**Use cases**:
+- Personal/team laptops
+- Production servers
+- Internet-facing machines
+- Corporate environments
+
+### Switching Environments
+
+```bash
+# Development (default in ansible.cfg)
+ansible-playbook playbooks/workstation_setup.yml
+
+# Production (explicit)
+ansible-playbook playbooks/workstation_setup.yml \
+  -i inventories/production/hosts.yml
 ```
 
 ## Available Roles

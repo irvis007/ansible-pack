@@ -1,0 +1,57 @@
+---
+# Development Environment Inventory
+# Use this for local testing, VMs, and development machines
+
+all:
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    environment_name: development
+
+  children:
+    # Local testing
+    local:
+      hosts:
+        localhost:
+          ansible_connection: local
+          ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+    # Workstations (laptops, desktops, dev machines)
+    workstations:
+      hosts:
+        # Example: Your local workstation
+        # my-laptop:
+        #   ansible_connection: local
+
+        # Example: Remote workstation for testing
+        # test-workstation:
+        #   ansible_host: 192.168.1.100
+        #   ansible_user: testuser
+
+      # Workstation-specific variables
+      vars:
+        # Development tools installation
+        install_docker: true
+        install_astronvim: true
+        install_zsh: true
+
+        # Relaxed security for development
+        apply_hardening: false
+        ufw_enabled: false
+
+    # Servers (test servers, homelab servers)
+    servers:
+      hosts:
+        # Example: Test server VM
+        # test-server:
+        #   ansible_host: 192.168.1.200
+        #   ansible_user: ansible
+
+      # Server-specific variables
+      vars:
+        # Basic hardening for test servers
+        apply_hardening: true
+        ufw_enabled: true
+        fail2ban_enabled: true
+
+        # But with relaxed settings for testing
+        ssh_password_authentication: yes  # Allow for testing

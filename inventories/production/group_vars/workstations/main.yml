@@ -1,0 +1,23 @@
+---
+# Production Workstations Configuration
+
+# Development Tools
+install_docker: true
+install_astronvim: true
+install_zsh: true
+install_fonts: true
+install_utilities: true
+
+# CLI Tools
+cli_tools_enabled: true
+
+# Security - Balanced for Workstations
+sudo_passwordless_allowed: false  # Require password for sudo
+apply_hardening: false  # Workstations don't need full server hardening
+ufw_enabled: false      # Usually behind corporate firewall
+
+# Package Management
+package_update_cache: true
+
+# Automatic Updates - Optional for workstations
+unattended_upgrades_enabled: false  # User controls updates

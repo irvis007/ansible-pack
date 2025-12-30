@@ -1,0 +1,41 @@
+---
+# Development Servers Configuration
+
+# Server Tools (no workstation tools)
+install_docker: false
+install_astronvim: false
+install_zsh: false
+install_fonts: false
+install_utilities: false
+
+# Security - Moderate for Test Servers
+sudo_passwordless_allowed: true  # Easier for testing
+apply_hardening: true
+ufw_enabled: true
+fail2ban_enabled: true
+
+# SSH Configuration - Relaxed for development
+ssh_password_authentication: yes
+ssh_custom_port: 22  # Use default for development
+
+# UFW Rules for Development Servers
+ufw_rules:
+  - rule: allow
+    port: "22"
+    proto: tcp
+    comment: "SSH (default port for dev)"
+  - rule: allow
+    port: "80"
+    proto: tcp
+    comment: "HTTP"
+  - rule: allow
+    port: "443"
+    proto: tcp
+    comment: "HTTPS"
+
+# Fail2ban - Lenient for development
+fail2ban_bantime: 10m
+fail2ban_maxretry: 5
+
+# Automatic Updates - Disabled for testing
+unattended_upgrades_enabled: false

@@ -1,0 +1,94 @@
+---
+# Server Setup Playbook
+# Base server configuration and hardening
+
+- name: Configure and Harden Server
+  hosts: servers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display environment information
+      ansible.builtin.debug:
+        msg: |
+          Setting up server: {{ inventory_hostname }}
+          Environment: {{ environment_name | default('unknown') }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Hardening: {{ 'Enabled' if apply_hardening | default(true) else 'Disabled' }}
+
+    - name: Ensure target is in servers group
+      ansible.builtin.assert:
+        that:
+          - "'servers' in group_names"
+        fail_msg: "This playbook should only run on servers"
+        success_msg: "Target validated as server"
+
+    - name: Check SSH port before firewall changes
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  IMPORTANT: Current SSH port will be {{ ssh_custom_port | default(22) }}
+          Make sure you can connect on this port before firewall is enabled!
+      when:
+        - ufw_enabled | default(false)
+        - ssh_custom_port is defined
+        - ssh_custom_port != 22
+
+  roles:
+    - role: bootstrap
+      tags: ['bootstrap', 'users']
+      when:
+        - bootstrap_ansible_user | default(false)
+        - inventory_hostname != 'localhost'
+
+    - role: hardening
+      tags: ['hardening', 'security']
+      when: apply_hardening | default(true)
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Server setup completed!
+          ========================================
+
+          Configuration applied:
+          - Hardening: {{ 'Yes' if apply_hardening | default(true) else 'No' }}
+          - Firewall (UFW): {{ 'Enabled' if ufw_enabled | default(false) else 'Disabled' }}
+          - fail2ban: {{ 'Enabled' if fail2ban_enabled | default(false) else 'Disabled' }}
+          - SSH Port: {{ ssh_custom_port | default(22) }}
+
+          Security Status:
+          - Passwordless sudo: {{ 'ENABLED (⚠️  Dev only!)' if sudo_passwordless_allowed | default(false) else 'DISABLED (✓ Secure)' }}
+          - SSH password auth: {{ 'ENABLED (⚠️  Less secure)' if ssh_password_authentication | default('yes') == 'yes' else 'DISABLED (✓ Secure)' }}
+          ========================================
+
+    - name: Display firewall warning
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  CRITICAL: Firewall is now ENABLED
+          Make sure you can still connect via SSH on port {{ ssh_custom_port | default(22) }}
+          Test connection: ssh -p {{ ssh_custom_port | default(22) }} {{ ansible_user }}@{{ ansible_host }}
+      when: ufw_enabled | default(false)
+
+    - name: Security recommendations
+      ansible.builtin.debug:
+        msg: |
+          🔒 Security Recommendations:
+          {% if sudo_passwordless_allowed | default(false) %}
+          - Set sudo_passwordless_allowed: false in production
+          {% endif %}
+          {% if ssh_password_authentication | default('yes') == 'yes' %}
+          - Disable SSH password authentication (use keys only)
+          {% endif %}
+          {% if not fail2ban_enabled | default(false) %}
+          - Enable fail2ban for intrusion prevention
+          {% endif %}
+          {% if ssh_custom_port | default(22) == 22 %}
+          - Consider using a custom SSH port (not 22)
+          {% endif %}
+      when:
+        - sudo_passwordless_allowed | default(false) or
+          ssh_password_authentication | default('yes') == 'yes' or
+          not fail2ban_enabled | default(false) or
+          ssh_custom_port | default(22) == 22

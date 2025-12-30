@@ -1,0 +1,53 @@
+---
+# Production Servers Configuration
+
+# Server Tools (minimal installation)
+install_docker: false
+install_astronvim: false
+install_zsh: false
+install_fonts: false
+install_utilities: false
+
+# Security - STRICT for Production
+sudo_passwordless_allowed: false  # Always require password
+apply_hardening: true
+ufw_enabled: true
+fail2ban_enabled: true
+
+# SSH Configuration - Hardened
+ssh_password_authentication: no
+ssh_permit_root_login: no
+ssh_custom_port: 65522  # Custom SSH port
+
+# SSH Hardening
+ssh_max_auth_tries: 3
+ssh_max_sessions: 2
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+
+# UFW Rules for Production Servers
+# Note: These are base rules, override in host_vars or specific server groups
+ufw_rules:
+  - rule: allow
+    port: "{{ ssh_custom_port }}"
+    proto: tcp
+    comment: "SSH (Custom Port)"
+  # Add more rules as needed per server group
+
+# Fail2ban - Strict Configuration
+fail2ban_bantime: 1w
+fail2ban_findtime: 60m
+fail2ban_maxretry: 3
+
+# Automatic Updates - ENABLED for production
+unattended_upgrades_enabled: true
+unattended_remove_unused_dependencies: true
+unattended_remove_unused_kernel_packages: true
+unattended_automatic_reboot: false  # Require manual reboot
+unattended_automatic_reboot_time: "03:00"
+
+# Monitoring (for future implementation)
+install_monitoring: false
+
+# Logging
+log_level: warning
