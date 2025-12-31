@@ -288,6 +288,60 @@ ZSH shell with Oh-My-Zsh and useful plugins.
 
 **Plugins**: autosuggestions, completions, syntax-highlighting, autoupdate
 
+## Testing
+
+This repository includes a comprehensive 3-layer testing approach:
+
+### Layer 1: Unit Testing (Molecule + Docker)
+Fast tests for individual roles using Docker containers.
+
+```bash
+# Install testing tools (one-time)
+make install-molecule
+
+# Test a specific role (~30 seconds)
+make test-role ROLE=zsh
+
+# Test all roles
+make test-all
+
+# Interactive development
+make molecule-create ROLE=zsh    # Create containers
+make molecule-converge ROLE=zsh  # Apply role
+make molecule-verify ROLE=zsh    # Run tests
+make molecule-destroy ROLE=zsh   # Cleanup
+```
+
+**Benefits:**
+- ⚡ Very fast (30 seconds per role)
+- 🔄 Test on Ubuntu and Debian simultaneously
+- ✅ Validates idempotency automatically
+- 🐳 Uses Docker (lightweight, no VMs needed)
+
+### Quick Start Testing
+
+```bash
+# 1. Setup (one-time)
+make setup
+make install-molecule
+
+# 2. Test before committing
+make lint              # Check code quality
+make syntax-check      # Validate syntax
+make test-role ROLE=zsh  # Test your changes
+
+# 3. Pre-commit checks
+make pre-commit        # Runs lint + syntax-check
+```
+
+See full testing guide: [docs/TESTING.md](docs/TESTING.md) and [docs/TESTING_QUICKSTART.md](docs/TESTING_QUICKSTART.md)
+
+### Layer 2 & 3: Integration and Acceptance Testing
+- **Layer 2 (LXD)**: Full playbook testing with real OS containers
+- **Layer 3 (Proxmox)**: Manual validation and smoke tests on actual VMs
+
+(Documentation coming soon)
+
 ## Security Features
 
 ### Production Security Checklist
