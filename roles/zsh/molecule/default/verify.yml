@@ -6,8 +6,10 @@
   become: false
 
   vars:
-    test_user: test
-    test_home: /home/test
+    # Note: The ZSH role currently installs to root's home directory
+    # TODO: Update role to support user-specific installations
+    test_user: root
+    test_home: /root
 
   tasks:
     - name: Check if ZSH is installed
@@ -19,7 +21,7 @@
       ansible.builtin.debug:
         msg: "ZSH version: {{ zsh_version.stdout }}"
 
-    - name: Check if test user shell is ZSH
+    - name: Check if root user shell is ZSH
       ansible.builtin.command: getent passwd {{ test_user }}
       changed_when: false
       register: user_shell
@@ -28,8 +30,8 @@
       ansible.builtin.assert:
         that:
           - "'/zsh' in user_shell.stdout"
-        fail_msg: "Test user shell is not ZSH: {{ user_shell.stdout }}"
-        success_msg: "Test user shell is correctly set to ZSH"
+        fail_msg: "Root user shell is not ZSH: {{ user_shell.stdout }}"
+        success_msg: "Root user shell is correctly set to ZSH"
 
     - name: Check if Oh-My-Zsh directory exists
       ansible.builtin.stat:

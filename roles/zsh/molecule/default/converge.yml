@@ -20,10 +20,8 @@
       become: true
       when: ansible_os_family == 'Debian'
 
-  tasks:
-    - name: Include zsh role
-      ansible.builtin.include_role:
-        name: zsh
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
       vars:
         # Override for testing
         zsh_local_user: test

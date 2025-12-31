@@ -9,38 +9,27 @@ driver:
   name: docker
 
 platforms:
-  # Ubuntu 22.04 LTS
+  # Ubuntu 22.04 LTS - simplified, no systemd needed for ZSH testing
   - name: zsh-ubuntu22
     image: geerlingguy/docker-ubuntu2204-ansible:latest
     pre_build_image: true
-    privileged: true
-    command: /lib/systemd/systemd
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /run
-      - /tmp
 
-  # Debian 12 (Bookworm)
+  # Debian 12 (Bookworm) - simplified
   - name: zsh-debian12
     image: geerlingguy/docker-debian12-ansible:latest
     pre_build_image: true
-    privileged: true
-    command: /lib/systemd/systemd
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /run
-      - /tmp
 
 provisioner:
   name: ansible
   log: true
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/../../"
   config_options:
     defaults:
       callbacks_enabled: profile_tasks,timer
       stdout_callback: yaml
       verbosity: 1
+      remote_tmp: /tmp/.ansible-${USER}/tmp
   inventory:
     host_vars:
       zsh-ubuntu22:
