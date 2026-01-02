@@ -336,9 +336,46 @@ make pre-commit        # Runs lint + syntax-check
 
 See full testing guide: [docs/TESTING.md](docs/TESTING.md) and [docs/TESTING_QUICKSTART.md](docs/TESTING_QUICKSTART.md)
 
-### Layer 2 & 3: Integration and Acceptance Testing
-- **Layer 2 (LXD)**: Full playbook testing with real OS containers
-- **Layer 3 (Proxmox)**: Manual validation and smoke tests on actual VMs
+### Layer 2: Integration Testing (LXD)
+
+✅ **Status: Validated and Working**
+
+System-level testing with full OS containers (~5-10 minutes per scenario).
+
+```bash
+# Install LXD (one-time)
+sudo snap install lxd
+sudo usermod -aG lxd $USER
+sudo lxd init --minimal
+
+# Configure network (see docs for details)
+# See docs/TESTING_LXD.md for full network setup
+
+# Run integration tests
+make lxd-test-workstation  # Test workstation setup
+make lxd-test-server        # Test server hardening
+make lxd-test-all           # Run all tests
+
+# Clean up
+make lxd-clean
+```
+
+**Test Results:**
+- ✅ Workstation scenario: 64 tasks, 0 failures
+- ✅ Roles tested: fonts, utilities, nvim, zsh
+- ✅ Full integration validation complete
+
+**Documentation:**
+- [LXD Testing Guide](docs/TESTING_LXD.md) - Complete setup and usage
+- [Testing Findings](docs/TESTING_FINDINGS.md) - Issues discovered and lessons learned
+- [Quick Reference](docs/TESTING_FINDINGS_QUICKREF.md) - Critical issues summary
+- [Testing Strategy](docs/TESTING_SUMMARY.md) - Overall testing approach
+
+### Layer 3: Acceptance Testing (Proxmox)
+
+📋 **Status: Planned**
+
+Final validation on production-like VMs in homelab environment.
 
 (Documentation coming soon)
 

@@ -222,13 +222,91 @@ journalctl -xe  # Check host logs
 ```
 
 ### Network Issues
+
+#### Containers Cannot Reach Internet
+
+**Symptoms**: Containers can't ping external IPs, `apt-get update` fails, git clone fails
+
+**Diagnosis**:
 ```bash
-# Check LXD network
+# Test from container
+lxc exec test-workstation -- ping -c 2 8.8.8.8
+# If this fails with 100% packet loss, follow steps below
+```
+
+**Solution**:
+
+1. **Enable IP forwarding** (required for NAT):
+   ```bash
+   # Check current setting
+   cat /proc/sys/net/ipv4/ip_forward
+   # If 0, enable it
+   sudo sysctl -w net.ipv4.ip_forward=1
+
+   # Make permanent
+   echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+   ```
+
+2. **Find your internet interface**:
+   ```bash
+   ip route | grep default
+   # Example output: default via 192.168.1.1 dev eth0
+   # Your interface is "eth0" (or enp*, wlp*, enx*, etc.)
+   ```
+
+3. **Add NAT rule** (replace `eth0` with your interface from step 2):
+   ```bash
+   sudo iptables -t nat -A POSTROUTING -s 10.100.100.0/24 -o eth0 -j MASQUERADE
+
+   # Verify it was added
+   sudo iptables -t nat -L POSTROUTING -n -v
+   # You should see a line with source 10.100.100.0/24
+   ```
+
+4. **Allow traffic through FORWARD chain**:
+   ```bash
+   # Check if FORWARD policy is DROP
+   sudo iptables -L FORWARD -n -v
+
+   # If policy is DROP, add allow rules
+   sudo iptables -I FORWARD 1 -s 10.100.100.0/24 -j ACCEPT
+   sudo iptables -I FORWARD 1 -d 10.100.100.0/24 -j ACCEPT
+
+   # Verify rules were added
+   sudo iptables -L FORWARD -n -v --line-numbers
+   ```
+
+5. **Make rules persistent** (so they survive reboot):
+   ```bash
+   sudo apt install iptables-persistent
+   sudo netfilter-persistent save
+   ```
+
+6. **Test connectivity**:
+   ```bash
+   lxc exec test-workstation -- ping -c 2 8.8.8.8
+   lxc exec test-workstation -- apt-get update
+   ```
+
+#### General Network Troubleshooting
+
+```bash
+# Check LXD network status
 lxc network list
 lxc network show lxdbr0
 
-# Restart LXD network
-sudo systemctl restart lxd
+# Check container IP
+lxc list
+
+# Test host can reach container
+ping $(lxc list test-workstation -c 4 --format csv | cut -d' ' -f1)
+
+# Restart LXD (for snap installation)
+sudo snap restart lxd
+
+# Check iptables rules
+sudo iptables -t nat -L POSTROUTING -n -v
+sudo iptables -L FORWARD -n -v
 ```
 
 ### Permission Denied
