@@ -1,0 +1,85 @@
+---
+# LXD Integration Test: Workstation Setup
+# Tests the complete workstation configuration playbook
+
+- name: Test Workstation Setup in LXD
+  hosts: test_workstations
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display test information
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Testing Workstation Setup
+          ========================================
+          Host: {{ inventory_hostname }}
+          Image: {{ lxd_image | default('unknown') }}
+          Testing: Fonts, Utilities, NeoVim, ZSH
+          ========================================
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+
+    - name: Install base dependencies for testing
+      ansible.builtin.apt:
+        name:
+          - unzip
+          - curl
+          - wget
+          - git
+          - fontconfig
+        state: present
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - role: fonts
+      when: install_fonts | default(true)
+
+    - role: utilities
+      when: install_utilities | default(true)
+
+    - role: nvim
+      vars:
+        nodejs_install_npm_user: root
+      when: install_nvim | default(true)
+
+    - role: zsh
+      when: install_zsh | default(true)
+
+  post_tasks:
+    - name: Verify installations
+      block:
+        - name: Check ZSH installation
+          ansible.builtin.command: zsh --version
+          register: zsh_check
+          changed_when: false
+          failed_when: false
+
+        - name: Check NeoVim installation
+          ansible.builtin.command: nvim --version
+          register: nvim_check
+          changed_when: false
+          failed_when: false
+
+        - name: Display verification results
+          ansible.builtin.debug:
+            msg: |
+              ========================================
+              Workstation Setup Test Results
+              ========================================
+              ZSH: {{ 'PASSED' if zsh_check.rc == 0 else 'FAILED' }}
+              NeoVim: {{ 'PASSED' if nvim_check.rc == 0 else 'FAILED' }}
+              ========================================
+
+        - name: Assert all required tools are installed
+          ansible.builtin.assert:
+            that:
+              - zsh_check.rc == 0
+              - nvim_check.rc == 0
+            fail_msg: "One or more workstation tools failed to install"
+            success_msg: "All workstation tools installed successfully!"

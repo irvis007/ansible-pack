@@ -20,7 +20,7 @@ help:
 	@echo "  make setup              - Install Ansible dependencies (collections, roles)"
 	@echo "  make install-molecule   - Install Molecule for testing"
 	@echo ""
-	@echo "$(GREEN)Testing (Layer 1 - Molecule):$(NC)"
+	@echo "$(GREEN)Testing (Layer 1 - Molecule/Docker):$(NC)"
 	@echo "  make test-role ROLE=zsh           - Test specific role with Molecule"
 	@echo "  make test-all                     - Test all roles with Molecule"
 	@echo "  make molecule-create ROLE=zsh     - Create test containers"
@@ -28,6 +28,13 @@ help:
 	@echo "  make molecule-verify ROLE=zsh     - Run verification tests"
 	@echo "  make molecule-destroy ROLE=zsh    - Destroy test containers"
 	@echo "  make molecule-login ROLE=zsh      - Login to test container"
+	@echo ""
+	@echo "$(GREEN)Testing (Layer 2 - LXD):$(NC)"
+	@echo "  make lxd-create NAME=test-workstation-ubuntu - Create LXD container"
+	@echo "  make lxd-test-workstation         - Test workstation setup in LXD"
+	@echo "  make lxd-test-server              - Test server hardening in LXD"
+	@echo "  make lxd-test-all                 - Run all LXD integration tests"
+	@echo "  make lxd-clean                    - Clean up LXD test containers"
 	@echo ""
 	@echo "$(GREEN)Code Quality:$(NC)"
 	@echo "  make lint               - Run ansible-lint and yamllint"
@@ -42,8 +49,8 @@ help:
 	@echo "  make clean              - Clean temporary files and containers"
 	@echo ""
 	@echo "$(YELLOW)Examples:$(NC)"
-	@echo "  make test-role ROLE=zsh          # Test ZSH role"
-	@echo "  make molecule-create ROLE=nvim   # Create containers for nvim role"
+	@echo "  make test-role ROLE=zsh          # Test ZSH role (Layer 1)"
+	@echo "  make lxd-test-workstation        # Test full workstation (Layer 2)"
 	@echo "  make lint                        # Check code quality"
 
 # ============================================================================
@@ -188,6 +195,44 @@ dry-run:
 		-i inventories/$(ENV)/hosts.yml \
 		--check \
 		--diff
+
+# ============================================================================
+# LXD Integration Testing (Layer 2)
+# ============================================================================
+
+LXD_NAME ?= test-workstation-ubuntu
+LXD_IMAGE ?= ubuntu:22.04
+
+lxd-check:
+	@if ! command -v lxc >/dev/null 2>&1; then \
+		echo "$(RED)ERROR: LXD is not installed$(NC)"; \
+		echo "Install with: sudo snap install lxd"; \
+		exit 1; \
+	fi
+
+lxd-create: lxd-check
+	@echo "$(BLUE)Creating LXD container: $(LXD_NAME)$(NC)"
+	@./tests/lxd/scripts/setup_container.sh $(LXD_NAME) $(LXD_IMAGE)
+
+lxd-test-workstation: lxd-check
+	@echo "$(BLUE)Running workstation integration tests...$(NC)"
+	@./tests/lxd/scripts/run_tests.sh workstation no
+
+lxd-test-server: lxd-check
+	@echo "$(BLUE)Running server integration tests...$(NC)"
+	@./tests/lxd/scripts/run_tests.sh server no
+
+lxd-test-all: lxd-check
+	@echo "$(BLUE)Running all LXD integration tests...$(NC)"
+	@./tests/lxd/scripts/run_tests.sh all yes
+
+lxd-clean: lxd-check
+	@echo "$(BLUE)Cleaning up LXD test containers...$(NC)"
+	@./tests/lxd/scripts/cleanup.sh
+
+lxd-list: lxd-check
+	@echo "$(BLUE)LXD containers:$(NC)"
+	@lxc list
 
 # ============================================================================
 # Cleanup

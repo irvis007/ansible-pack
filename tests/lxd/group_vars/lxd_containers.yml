@@ -1,0 +1,36 @@
+---
+# Common variables for LXD integration testing containers
+
+# Testing environment settings
+environment_name: testing
+testing_mode: true
+
+# Relaxed security for testing
+sudo_passwordless_allowed: true
+ufw_enabled: false
+ssh_password_authentication: "no"
+
+# Faster testing settings
+apt_cache_valid_time: 3600
+
+# Common packages for testing
+common_packages:
+  - curl
+  - git
+  - vim
+  - sudo
+
+# Test user settings
+test_user: testuser
+test_user_groups:
+  - sudo
+
+# ZSH settings for testing
+zsh_local_user: "{{ test_user | default('root') }}"
+
+# Docker settings for testing
+docker_users:
+  - "{{ test_user | default('root') }}"
+
+# Logging
+verbose_output: true
