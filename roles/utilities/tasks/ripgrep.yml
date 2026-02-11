@@ -1,0 +1,8 @@
+---
+# Install ripgrep (fast grep alternative)
+
+- name: Install ripgrep
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: ripgrep

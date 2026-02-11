@@ -1,0 +1,20 @@
+---
+# Utilities Role Defaults
+# Backward compatibility with role-level toggle
+
+# Master toggle (backward compatibility)
+utilities_enabled: "{{ install_utilities | default(true) }}"
+
+# Granular tool toggles (default to utilities_enabled state)
+# Override these in group_vars or host_vars for fine-grained control
+utilities_install_bat: "{{ utilities_enabled | bool }}"
+utilities_install_eza: "{{ utilities_enabled | bool }}"
+utilities_install_fd: "{{ utilities_enabled | bool }}"
+utilities_install_ripgrep: "{{ utilities_enabled | bool }}"
+utilities_install_dust: "{{ utilities_enabled | bool }}"
+utilities_install_zoxide: "{{ utilities_enabled | bool }}"
+utilities_install_tmux: "{{ utilities_enabled | bool }}"
+utilities_install_lazygit: "{{ utilities_enabled | bool }}"
+
+# Version pinning
+utilities_dust_version: "v1.0.0"

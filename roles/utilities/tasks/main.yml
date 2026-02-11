@@ -1,139 +1,47 @@
-# - name: Ensure NTP is installed
-#   package: name=ntp state=present
-# - name: Ensure NTP is installed
-#   service: name=ntpd state=started enabled=yes
-- name: "Include user-specific variables"
+---
+# Utilities Role - Orchestrator
+# Conditionally includes tool-specific tasks based on feature flags
+
+- name: Include user-specific variables
   include_vars: vars.yml
-  tags: nvim
+  tags: utilities
 
-- name: Check if dust is already installed on Ubuntu/Fedora
-  ansible.builtin.shell: >
-    dust --version
-  register: dust_rc
-  failed_when: false
-  changed_when: false
-  when: ansible_os_family != 'Archlinux'
+- name: Include bat installation
+  include_tasks: bat.yml
+  when: utilities_install_bat | bool
+  tags: ['utilities', 'bat']
 
-- name: Install dust on Ubuntu/Fedora
-  become: true
-  ansible.builtin.unarchive:
-    src: "https://github.com/bootandy/dust/releases/download/{{ dustversion }}/dust-{{ dustversion }}-i686-unknown-linux-gnu.tar.gz"
-    dest: /usr/local/bin
-    extra_opts:
-      - --strip=1
-      - --wildcards
-      - "*/dust"
-    remote_src: true
-  when: ansible_os_family != 'Archlinux' and dust_rc.rc != 0
+- name: Include eza installation
+  include_tasks: eza.yml
+  when: utilities_install_eza | bool
+  tags: ['utilities', 'eza']
 
-# Required for the Ubuntu repository (see below)
-- name: Install GPG and Wget in Ubuntu
-  become: true
-  ansible.builtin.package:
-    state: present
-    name:
-      - gpg
-      - wget
-  when: ansible_os_family == 'Debian'
+- name: Include fd installation
+  include_tasks: fd.yml
+  when: utilities_install_fd | bool
+  tags: ['utilities', 'fd']
 
-# In Ubuntu we have to install it from another repository
-# so it's better to check if it's already installed
-- name: Check if eza is already installed on Ubuntu
-  ansible.builtin.shell: >
-    eza --version
-  register: eza_rc
-  failed_when: false
-  changed_when: false
-  when: ansible_os_family == 'Debian'
+- name: Include ripgrep installation
+  include_tasks: ripgrep.yml
+  when: utilities_install_ripgrep | bool
+  tags: ['utilities', 'ripgrep']
 
-- name: Repository for eza on Ubuntu
-  become: true
-  ansible.builtin.shell: |
-    mkdir -p /etc/apt/keyrings
-    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | tee /etc/apt/sources.list.d/gierens.list
-    chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-    apt update
-  when: ansible_os_family == 'Debian' and eza_rc.rc != 0
+- name: Include dust installation
+  include_tasks: dust.yml
+  when: utilities_install_dust | bool
+  tags: ['utilities', 'dust']
 
-- name: Install eza through package manager
-  become: true
-  ansible.builtin.package:
-    state: present
-    name: eza
+- name: Include zoxide installation
+  include_tasks: zoxide.yml
+  when: utilities_install_zoxide | bool
+  tags: ['utilities', 'zoxide']
 
-- name: Install fd-find
-  become: true
-  ansible.builtin.package:
-    state: present
-    name: "{{ fdfind }}"
+- name: Include tmux installation
+  include_tasks: tmux.yml
+  when: utilities_install_tmux | bool
+  tags: ['utilities', 'tmux']
 
-- name: Create link fd to fdfind in Debian
-  become: true
-  ansible.builtin.file:
-    src: "/usr/bin/fdfind"
-    dest: "/usr/bin/fd"
-    state: link
-  when: ansible_os_family == 'Debian'
-
-- name: Install bat
-  become: true
-  ansible.builtin.package:
-    state: present
-    name: bat
-
-- name: Create link bat to batcat in Debian
-  become: true
-  ansible.builtin.file:
-    src: "/usr/bin/batcat"
-    dest: "/usr/bin/bat"
-    state: link
-  when: ansible_os_family == 'Debian'
-  # and ansible_distribution_version is version('23.04', '<')
-
-# In Ubuntu Focal we have to install it from archive
-# so it's better to check if it's already installed
-- name: Check if zoxide is already installed on Ubuntu
-  ansible.builtin.shell: >
-    zoxide --version
-  register: zoxide_rc
-  failed_when: false
-  changed_when: false
-  when: ansible_os_family == 'Debian'
-
-- name: Download zoxide installer script
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh
-    dest: /tmp/zoxide-install.sh
-    mode: '0755'
-  become: true
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
-
-- name: Install zoxide on Ubuntu
-  become: true
-  ansible.builtin.command:
-    cmd: /tmp/zoxide-install.sh
-    creates: /usr/local/bin/zoxide
-  environment:
-    SHELL: /bin/bash
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
-
-- name: Cleanup zoxide installer
-  ansible.builtin.file:
-    path: /tmp/zoxide-install.sh
-    state: absent
-  become: true
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
-# - name: Install zoxide through package manager
-#   become: true
-#   ansible.builtin.package:
-#     state: present
-#     name: zoxide
-#
-#   when: ansible_os_family != 'Debian' or ansible_distribution_version is version('20.10', '>=')
-
-- name: Install tmux
-  become: true
-  ansible.builtin.package:
-    state: present
-    name: tmux
+- name: Include lazygit installation
+  include_tasks: lazygit.yml
+  when: utilities_install_lazygit | bool
+  tags: ['utilities', 'lazygit']

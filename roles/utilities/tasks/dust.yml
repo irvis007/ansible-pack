@@ -1,0 +1,21 @@
+---
+# Install dust (disk usage analyzer)
+
+- name: Check if dust is already installed
+  ansible.builtin.shell: dust --version
+  register: dust_rc
+  failed_when: false
+  changed_when: false
+  when: ansible_os_family != 'Archlinux'
+
+- name: Install dust
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://github.com/bootandy/dust/releases/download/{{ utilities_dust_version }}/dust-{{ utilities_dust_version }}-i686-unknown-linux-gnu.tar.gz"
+    dest: /usr/local/bin
+    extra_opts:
+      - --strip=1
+      - --wildcards
+      - "*/dust"
+    remote_src: true
+  when: ansible_os_family != 'Archlinux' and dust_rc.rc != 0

@@ -1,0 +1,16 @@
+---
+# Install fd (modern find replacement)
+
+- name: Install fd-find
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: "{{ fdfind }}"
+
+- name: Create fd symlink (Debian)
+  become: true
+  ansible.builtin.file:
+    src: "/usr/bin/fdfind"
+    dest: "/usr/bin/fd"
+    state: link
+  when: ansible_os_family == 'Debian'

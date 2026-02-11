@@ -1,0 +1,16 @@
+---
+# Install bat (cat with syntax highlighting)
+
+- name: Install bat
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: bat
+
+- name: Create bat symlink (Debian)
+  become: true
+  ansible.builtin.file:
+    src: "/usr/bin/batcat"
+    dest: "/usr/bin/bat"
+    state: link
+  when: ansible_os_family == 'Debian'
