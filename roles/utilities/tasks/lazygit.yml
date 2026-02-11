@@ -1,0 +1,24 @@
+---
+# Install lazygit (terminal UI for git)
+
+- name: Check if lazygit is already installed
+  ansible.builtin.shell: lazygit --version
+  register: lazygit_rc
+  failed_when: false
+  changed_when: false
+
+- name: Get latest lazygit version
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+    return_content: true
+  register: lazygit_latest
+  when: lazygit_rc.rc != 0
+
+- name: Install lazygit
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://github.com/jesseduffield/lazygit/releases/download/{{ lazygit_latest.json.tag_name }}/lazygit_{{ lazygit_latest.json.tag_name | regex_replace('^v', '') }}_Linux_x86_64.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    creates: /usr/local/bin/lazygit
+  when: lazygit_rc.rc != 0

@@ -1,0 +1,8 @@
+---
+# Install tmux (terminal multiplexer)
+
+- name: Install tmux
+  become: true
+  ansible.builtin.package:
+    state: present
+    name: tmux
