@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/irvis007/ansible-pack/compare/v1.2.0...v1.3.0) (2026-02-11)
+
+
+### Features
+
+* **nvim:** Refresh and refactor nvim role ([f0e81af](https://github.com/irvis007/ansible-pack/commit/f0e81af0c09e86dd1e89799a76d9094362516e40))
+
 # [1.2.0](https://github.com/irvis007/ansible-pack/compare/v1.1.0...v1.2.0) (2026-02-11)
 
 
