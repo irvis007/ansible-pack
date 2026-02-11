@@ -4,6 +4,8 @@ This roadmap tracks planned features, improvements, and priorities for the ansib
 
 ## Done ✅
 
+### Version 1.1.0 (2026-02-11)\n- See [CHANGELOG.md](CHANGELOG.md) for details\n
+
 ### Version 1.0.0 (2026-02-11)\n- See [CHANGELOG.md](CHANGELOG.md) for details\n
 
 ### 2024-2025
