@@ -1,0 +1,73 @@
+---
+# Install AstroNvim configuration
+
+# ============================================================================
+# Method: user_repo (Default - Clone user's complete AstroNvim fork)
+# ============================================================================
+- name: "[AstroNvim] Clone user's AstroNvim configuration repository"
+  ansible.builtin.git:
+    repo: "{{ nvim_user_repo }}"
+    dest: "{{ nvim_config_dir }}"
+    depth: 1
+    force: yes
+  when: nvim_install_method == "user_repo"
+
+# ============================================================================
+# Method: template (Clone official AstroNvim template only)
+# ============================================================================
+- name: "[AstroNvim] Clone official AstroNvim template"
+  ansible.builtin.git:
+    repo: "{{ nvim_template_repo }}"
+    dest: "{{ nvim_config_dir }}"
+    depth: 1
+    force: yes
+  when: nvim_install_method == "template"
+
+# ============================================================================
+# Method: user_repo_with_upstream (Clone user repo + add upstream remote)
+# ============================================================================
+- name: "[AstroNvim] Clone user's AstroNvim configuration repository (with upstream)"
+  ansible.builtin.git:
+    repo: "{{ nvim_user_repo }}"
+    dest: "{{ nvim_config_dir }}"
+    depth: 1
+    force: yes
+  when: nvim_install_method == "user_repo_with_upstream"
+
+- name: "[AstroNvim] Add upstream remote for template updates"
+  ansible.builtin.command:
+    cmd: "git remote add upstream {{ nvim_template_repo }}"
+    chdir: "{{ nvim_config_dir }}"
+  register: git_remote_add
+  failed_when: false
+  changed_when: git_remote_add.rc == 0
+  when: nvim_install_method == "user_repo_with_upstream"
+
+- name: "[AstroNvim] Fetch upstream template"
+  ansible.builtin.command:
+    cmd: "git fetch upstream"
+    chdir: "{{ nvim_config_dir }}"
+  when:
+    - nvim_install_method == "user_repo_with_upstream"
+    - git_remote_add.rc == 0
+  changed_when: false
+
+# ============================================================================
+# Initialization (All methods)
+# ============================================================================
+- name: "[AstroNvim] Initialize AstroNvim (install plugins)"
+  ansible.builtin.shell: "{{ nvim_init_command }}"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  when: nvim_run_initialization | bool
+  changed_when: false
+  async: 300
+  poll: 10
+
+- name: "[AstroNvim] Display installation complete message"
+  ansible.builtin.debug:
+    msg:
+      - "AstroNvim installation complete!"
+      - "Installation method: {{ nvim_install_method }}"
+      - "Config directory: {{ nvim_config_dir }}"
+      - "Launch with: nvim"

@@ -1,0 +1,144 @@
+---
+# Install optional dependencies for AstroNvim
+
+# ============================================================================
+# Clipboard Support
+# ============================================================================
+- name: "[nvim] Install clipboard support ({{ nvim_clipboard_tool }})"
+  become: true
+  ansible.builtin.package:
+    name: "{{ nvim_clipboard_tool }}"
+    state: present
+  when: nvim_install_clipboard | bool
+
+# ============================================================================
+# lazygit - Git UI Toggle Terminal
+# ============================================================================
+- name: "[nvim] Check if lazygit is already installed"
+  ansible.builtin.command: lazygit --version
+  register: lazygit_installed
+  changed_when: false
+  failed_when: false
+  when: nvim_install_lazygit | bool
+
+- name: "[nvim] Get latest lazygit version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+    return_content: true
+  register: lazygit_latest
+  when:
+    - nvim_install_lazygit | bool
+    - lazygit_installed.rc != 0
+
+- name: "[nvim] Install lazygit"
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://github.com/jesseduffield/lazygit/releases/download/{{ lazygit_latest.json.tag_name }}/lazygit_{{ lazygit_latest.json.tag_name | regex_replace('^v', '') }}_Linux_x86_64.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    creates: /usr/local/bin/lazygit
+  when:
+    - nvim_install_lazygit | bool
+    - lazygit_installed.rc != 0
+
+# ============================================================================
+# gdu - Disk Usage Toggle Terminal
+# ============================================================================
+- name: "[nvim] Install gdu (go DiskUsage)"
+  become: true
+  ansible.builtin.package:
+    name: gdu
+    state: present
+  when: nvim_install_gdu | bool
+
+# ============================================================================
+# bottom (btm) - Process Viewer Toggle Terminal
+# ============================================================================
+- name: "[nvim] Check if bottom is already installed"
+  ansible.builtin.command: btm --version
+  register: bottom_installed
+  changed_when: false
+  failed_when: false
+  when: nvim_install_bottom | bool
+
+- name: "[nvim] Get latest bottom version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/ClementTsang/bottom/releases/latest
+    return_content: true
+  register: bottom_latest
+  when:
+    - nvim_install_bottom | bool
+    - bottom_installed.rc != 0
+
+- name: "[nvim] Download bottom"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_latest.json.tag_name }}/bottom_x86_64-unknown-linux-gnu.tar.gz"
+    dest: "/tmp/bottom.tar.gz"
+    mode: "0644"
+  when:
+    - nvim_install_bottom | bool
+    - bottom_installed.rc != 0
+
+- name: "[nvim] Extract bottom"
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/bottom.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  when:
+    - nvim_install_bottom | bool
+    - bottom_installed.rc != 0
+
+- name: "[nvim] Install bottom binary"
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/btm"
+    dest: "/usr/local/bin/btm"
+    mode: "0755"
+    remote_src: true
+  when:
+    - nvim_install_bottom | bool
+    - bottom_installed.rc != 0
+
+- name: "[nvim] Cleanup bottom installation files"
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/bottom.tar.gz"
+    - "/tmp/btm"
+  when:
+    - nvim_install_bottom | bool
+    - bottom_installed.rc != 0
+
+# ============================================================================
+# tree-sitter-cli - Syntax Parsing (npm global package)
+# ============================================================================
+- name: "[nvim] Install tree-sitter-cli (npm global)"
+  become: true
+  community.general.npm:
+    name: tree-sitter-cli
+    global: true
+  when: nvim_install_treesitter_cli | bool
+
+# ============================================================================
+# Python Provider Support
+# ============================================================================
+- name: "[nvim] Install Python provider packages"
+  become: true
+  ansible.builtin.package:
+    name: "{{ nvim_python_packages }}"
+    state: present
+  when: nvim_install_python_provider | bool
+
+# ============================================================================
+# Terminal Emulator (Optional)
+# ============================================================================
+- name: "[nvim] Install terminator"
+  become: true
+  ansible.builtin.package:
+    name: terminator
+    state: present
+  when: nvim_install_terminator | bool

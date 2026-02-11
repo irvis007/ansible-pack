@@ -1,0 +1,22 @@
+---
+# Backup existing Neovim configuration
+
+- name: "[nvim] Check if existing nvim config exists"
+  ansible.builtin.stat:
+    path: "{{ nvim_config_dir }}"
+  register: nvim_existing_config
+
+- name: "[nvim] Backup existing nvim configuration"
+  ansible.builtin.command:
+    cmd: "mv {{ nvim_config_dir }} {{ nvim_backup_dir }}"
+  when:
+    - nvim_existing_config.stat.exists
+    - nvim_existing_config.stat.isdir
+  changed_when: true
+
+- name: "[nvim] Display backup location"
+  ansible.builtin.debug:
+    msg: "Existing nvim config backed up to: {{ nvim_backup_dir }}"
+  when:
+    - nvim_existing_config.stat.exists
+    - nvim_existing_config.stat.isdir
