@@ -1,31 +1,145 @@
 ---
-# Set the version of Node.js to install ("12.x", "13.x", "14.x", "15.x", etc.).
+# Neovim & AstroNvim Role Defaults
+# Provides granular control over installation and optional dependencies
+
+# ============================================================================
+# Installation Method
+# ============================================================================
+# Options:
+#   - "user_repo": Clone user's complete AstroNvim fork (default, recommended)
+#   - "template": Clone official AstroNvim template only (vanilla)
+#   - "user_repo_with_upstream": Clone user repo + add upstream remote for updates
+nvim_install_method: "user_repo"
+
+# ============================================================================
+# Repository Configuration
+# ============================================================================
+# User's AstroNvim configuration repository (fork of AstroNvim/template)
+nvim_user_repo: "https://github.com/irvis007/astro-vim-v5.git"
+
+# Official AstroNvim template (for vanilla installs or upstream sync)
+nvim_template_repo: "https://github.com/AstroNvim/template.git"
+
+# Installation destination
+nvim_config_dir: "{{ ansible_env.HOME }}/.config/nvim"
+
+# ============================================================================
+# Backup Configuration
+# ============================================================================
+# Backup existing nvim config before installation
+nvim_backup_existing: true
+
+# Backup destination directory
+nvim_backup_dir: "{{ ansible_env.HOME }}/.config/nvim.backup.{{ ansible_date_time.epoch }}"
+
+# ============================================================================
+# Node.js Configuration
+# ============================================================================
+# Node.js version for language servers and npm packages
 # Version numbers from Nodesource: https://github.com/nodesource/distributions
 nodejs_version: "20.x"
 
-# The user for whom the npm packages will be installed.
-# nodejs_install_npm_user: username
+# User for npm global package installations
+# Uses current ansible user by default (fixes hardcoded username issue)
+nodejs_install_npm_user: "{{ ansible_user_id }}"
 
-# The directory for global installations.
+# Global npm packages directory
 npm_config_prefix: "/usr/local/lib/npm"
 
-# Set to true to suppress the UID/GID switching when running package scripts. If
-# set explicitly to false, then installing as a non-root user will fail.
+# Allow running npm scripts as root (needed for global installs)
 npm_config_unsafe_perm: "false"
 
-# Define a list of global packages to be installed with NPM.
-nodejs_npm_global_packages: []
-#  # Install a specific version of a package.
-#  - name: jslint
-#    version: 0.9.3
-#  # Install the latest stable release of a package.
-#  - name: node-sass
-#  # This shorthand syntax also works (same as previous example).
-#  - node-sass
-
-# The path of a package.json file used to install packages globally.
-nodejs_package_json_path: ""
-
-# Whether or not /etc/profile.d/npm.sh (globa) must be generated.
-# Set to false if you need to handle this manually with a per-user install.
+# Generate /etc/profile.d/npm.sh for global npm access
 nodejs_generate_etc_profile: "true"
+
+# Additional npm global packages (beyond tree-sitter-cli)
+nodejs_npm_global_packages: []
+
+# ============================================================================
+# Neovim Installation
+# ============================================================================
+# Install Neovim via official pre-built binary (latest stable from GitHub)
+nvim_install_neovim: true
+
+# ============================================================================
+# Core Dependencies (Required)
+# ============================================================================
+# These are required for AstroNvim to function properly
+nvim_install_core_deps: true
+
+# Core packages: git, tar, build-essential, cmake
+# Used for: version control, archives, compiling plugins
+nvim_core_packages:
+  - git
+  - tar
+  - build-essential
+  - cmake
+
+# ============================================================================
+# AstroNvim Required Dependencies
+# ============================================================================
+# These are explicitly required by AstroNvim documentation
+nvim_install_astronvim_deps: true
+
+# Required AstroNvim packages
+nvim_astronvim_required_packages:
+  - fd-find        # File finder (REQUIRED)
+  - ripgrep        # Live grep search (REQUIRED)
+
+# ============================================================================
+# Optional Dependencies (Recommended by AstroNvim)
+# ============================================================================
+# Individual feature flags for optional tools
+
+# Clipboard support (xclip or xsel) - HIGHLY RECOMMENDED
+# Required for system clipboard integration ("+y, "+p)
+nvim_install_clipboard: true
+nvim_clipboard_tool: "xclip"  # Options: "xclip", "xsel"
+
+# lazygit - Git UI toggle terminal
+nvim_install_lazygit: true
+
+# gdu (go DiskUsage) - Disk usage toggle terminal
+nvim_install_gdu: true
+
+# bottom (btm) - Process viewer toggle terminal
+nvim_install_bottom: true
+
+# tree-sitter-cli - Syntax parsing (npm global package)
+# Only needed if using auto_install feature
+nvim_install_treesitter_cli: true
+
+# ============================================================================
+# Language Provider Support (Optional)
+# ============================================================================
+# Python provider - Required for Python-based plugins and REPL
+nvim_install_python_provider: true
+nvim_python_packages:
+  - python3-pip
+  - python3-venv
+  - python3-neovim  # Neovim Python client
+
+# Node.js provider (installed via nodejs_version above)
+# Automatically available when Node.js is installed
+
+# ============================================================================
+# Additional Optional Tools
+# ============================================================================
+# Terminal emulator (for better terminal experience)
+nvim_install_terminator: false  # Most users have their own preferred terminal
+
+# ============================================================================
+# Initialization
+# ============================================================================
+# Run headless nvim to initialize plugins after installation
+nvim_run_initialization: true
+
+# Initialization command (installs plugins, Mason packages, etc.)
+nvim_init_command: "nvim --headless -c 'quitall'"
+
+# ============================================================================
+# Backward Compatibility
+# ============================================================================
+# These maintain compatibility with older configurations
+install_nvim: "{{ nvim_install_neovim | default(true) }}"
+install_astronvim: true

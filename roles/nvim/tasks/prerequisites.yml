@@ -1,0 +1,26 @@
+---
+# Install core dependencies for Neovim and AstroNvim
+
+- name: "[nvim] Update apt cache"
+  become: true
+  ansible.builtin.apt:
+    update_cache: yes
+    force_apt_get: yes
+
+- name: "[nvim] Wait for APT lock"
+  ansible.builtin.shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+  changed_when: false
+
+- name: "[nvim] Install core dependencies"
+  become: true
+  ansible.builtin.package:
+    name: "{{ nvim_core_packages }}"
+    state: present
+  when: nvim_install_core_deps | bool
+
+- name: "[nvim] Install AstroNvim required dependencies"
+  become: true
+  ansible.builtin.package:
+    name: "{{ nvim_astronvim_required_packages }}"
+    state: present
+  when: nvim_install_astronvim_deps | bool
