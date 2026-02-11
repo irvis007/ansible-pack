@@ -1,34 +1,47 @@
 ---
-# - import_tasks: fail2ban.yml
-# - import_tasks: ufw.yml
-# - import_tasks: updates.yml
-- import_tasks: suricata.yml
-# - name: harden ssh role
-#   ansible.builtin.include_role:
-#     name: devsec.hardening.ssh_hardening
-#   vars:
-#     network_ipv6_enable: false
-#     sftp_enabled: false
-#     ssh_allow_users: "{{ ansible_user_id }}"
-#     ssh_client_port: 22 #change it mate :)
-#     ssh_client_alive_count: 2
-#     ssh_max_auth_retries: 3
-#     ssh_max_sessions: 2
-#     ssh_print_last_log: true
-#   tags: hardening
-#
-# - name: harden os role
-#   ansible.builtin.include_role:
-#     name: devsec.hardening.os_hardening
-#   vars:
-#     sysctl_overwrite:
-#       # Enable IPv4 traffic forwarding.
-#       # for docker and WireGuard
-#       net.ipv4.ip_forward: 1
-#     ufw_enable_ipv6: false
-#   tags: hardening
-#
-# - name: install ClamAV
-#   ansible.builtin.include_role:
-#     role: geerlingguy.clama#   tags: hardening
-#   tags: hardening
+# Hardening Role - Main Tasks
+# Conditionally applies security hardening based on feature flags
+
+- name: Include fail2ban configuration
+  import_tasks: fail2ban.yml
+  when: hardening_enable_fail2ban | bool and hardening_enabled | bool
+  tags: ['hardening', 'fail2ban']
+
+- name: Include UFW firewall configuration
+  import_tasks: ufw.yml
+  when: hardening_enable_ufw | bool and hardening_enabled | bool
+  tags: ['hardening', 'ufw', 'firewall']
+
+- name: Include unattended upgrades configuration
+  import_tasks: updates.yml
+  when: hardening_enable_unattended_upgrades | bool and hardening_enabled | bool
+  tags: ['hardening', 'updates']
+
+- name: Include Suricata IDS configuration
+  import_tasks: suricata.yml
+  when: hardening_enable_suricata | bool and hardening_enabled | bool
+  tags: ['hardening', 'suricata', 'ids']
+
+- name: Apply SSH hardening
+  ansible.builtin.include_role:
+    name: devsec.hardening.ssh_hardening
+  when: hardening_enable_ssh_hardening | bool and hardening_enabled | bool
+  vars:
+    network_ipv6_enable: "{{ hardening_ssh_ipv6_enabled }}"
+    sftp_enabled: "{{ hardening_ssh_sftp_enabled }}"
+    ssh_allow_users: "{{ hardening_ssh_allow_users }}"
+    ssh_client_port: "{{ hardening_ssh_port }}"
+    ssh_client_alive_count: "{{ hardening_ssh_client_alive_count }}"
+    ssh_max_auth_retries: "{{ hardening_ssh_max_auth_retries }}"
+    ssh_max_sessions: "{{ hardening_ssh_max_sessions }}"
+    ssh_print_last_log: "{{ hardening_ssh_print_last_log }}"
+  tags: ['hardening', 'ssh']
+
+- name: Apply OS hardening
+  ansible.builtin.include_role:
+    name: devsec.hardening.os_hardening
+  when: hardening_enable_os_hardening | bool and hardening_enabled | bool
+  vars:
+    sysctl_overwrite: "{{ hardening_os_sysctl_overwrite }}"
+    ufw_enable_ipv6: false
+  tags: ['hardening', 'os']
