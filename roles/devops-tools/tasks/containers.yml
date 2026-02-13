@@ -1,0 +1,143 @@
+# Install Containers tools
+
+# ============================================================================
+# Docker - containers runtime
+# ============================================================================
+
+- name: "[devops-tools] Install Docker prerequisites"
+  become: true
+  ansible.builtin.package:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Add Docker GPG key"
+  become: true
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Add Docker registry"
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Install Docker packages"
+  become: true
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Add user to a docker group"
+  become: true
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_users }}"
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Enable and start Docker service"
+  become: true
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+  when: docker_enabled | bool
+
+# install ctop
+- name: "[devops-tools] Get latest ctop version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/bcicen/ctop/releases/latest
+    return_content: true
+  register: ctop_latest
+  when: ctop_enabled | bool
+
+- name: "[devops-tools] Check if ctop is installed"
+  ansible.builtin.command: ctop --version
+  register: ctop_check
+  failed_when: false
+  changed_when: false
+  when: ctop_enabled | bool
+
+- name: "[devops-tools] Download ctop binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/bcicen/ctop/releases/download/{{ ctop_latest.json.tag_name }}/ctop-{{ ctop_latest.json.tag_name }}-linux-amd64"
+    dest: "/usr/local/bin/ctop"
+    mode: "0755"
+  when:
+    - ctop_enabled | bool
+    - ctop_check.rc != 0
+
+# install dive
+- name: "[devops-tools] Get latest dive version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/wagoodman/dive/releases/latest
+    return_content: true
+  register: dive_latest
+  when: dive_enabled | bool
+
+- name: "[devops-tools] Check if dive is installed"
+  ansible.builtin.command: dive --version
+  register: dive_check
+  failed_when: false
+  changed_when: false
+  when: dive_enabled | bool
+
+- name: "[devops-tools] Download dive binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/wagoodman/dive/releases/download/{{ dive_latest.json.tag_name }}/dive_{{ dive_latest.json.tag_name | regex_replace('^v', '') }}_linux_amd64.tar.gz"
+    dest: "/tmp/dive.tar.gz"
+    mode: "0644"
+  when:
+    - dive_enabled | bool
+    - dive_check.rc != 0
+
+- name: "[devops-tools] Extract dive"
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/dive.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  when:
+    - dive_enabled | bool
+    - dive_check.rc != 0
+
+- name: "[devops-tools] Install dive"
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/dive"
+    dest: "/usr/local/bin/dive"
+    mode: "0755"
+    remote_src: true
+  when:
+    - dive_enabled | bool
+    - dive_check.rc != 0
+
+- name: "[devops-tools] Clean up dive installation"
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/dive.tar.gz"
+    - "/tmp/dive"
+  when:
+    - dive_enabled | bool
+    - dive_check.rc != 0

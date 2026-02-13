@@ -1,0 +1,84 @@
+# Install security tools
+
+- name: "[devops-tools] Install GPG"
+  become: true
+  ansible.builtin.package:
+    name: gnupg
+    state: present
+  when: gpg_enabled | bool
+
+- name: "[devops-tools] Install KeePassXC"
+  become: true
+  ansible.builtin.package:
+    name: keepassxc
+    state: present
+  when: keepassxc_enabled | bool
+
+# install age - modern encryption tool
+- name: "[devops-tools] Get latest age version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/FiloSottile/age/releases/latest
+    return_content: true
+  register: age_latest
+  when: age_enabled | bool
+
+- name: "[devops-tools] Check if age is installed"
+  ansible.builtin.command: age --version
+  register: age_check
+  failed_when: false
+  changed_when: false
+  when: age_enabled | bool
+
+- name: "[devops-tools] Download age binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/FiloSottile/age/releases/download/{{ age_latest.json.tag_name }}/age-{{ age_latest.json.tag_name }}-linux-amd64.tar.gz"
+    dest: "/tmp/age.tar.gz"
+    mode: "0644"
+  when:
+    - age_enabled | bool
+    - age_check.rc != 0
+
+- name: "[devops-tools] Extract age"
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/age.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  when:
+    - age_enabled | bool
+    - age_check.rc != 0
+
+- name: "[devops-tools] Install age"
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/age/age"
+    dest: "/usr/local/bin/age"
+    mode: "0755"
+    remote_src: true
+  when:
+    - age_enabled | bool
+    - age_check.rc != 0
+
+- name: "[devops-tools] Install age-keygen"
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/age/age-keygen"
+    dest: "/usr/local/bin/age-keygen"
+    mode: "0755"
+    remote_src: true
+  when:
+    - age_enabled | bool
+    - age_check.rc != 0
+
+- name: "[devops-tools] Clean up age installation"
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/age.tar.gz"
+    - "/tmp/age"
+  when:
+    - age_enabled | bool
+    - age_check.rc != 0

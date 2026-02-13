@@ -1,0 +1,84 @@
+# install utility tools for Devops role
+
+- name: "[devops-tools] Install Midnight Commander"
+  become: true
+  ansible.builtin.package:
+    name: mc
+    state: present
+  when: mc_enabled | bool
+
+- name: "[devops-tools] Install 7zip"
+  become: true
+  ansible.builtin.package:
+    name: p7zip-full
+    state: present
+  when: p7zip_enabled | bool
+
+# yq - yaml processor, like jq
+- name: "[devops-tools] Check if yq is installed"
+  ansible.builtin.command: yq --version
+  register: yq_check
+  failed_when: false
+  changed_when: false
+  when: yq_enabled | bool
+
+- name: "[devops-tools] Download yq binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
+    dest: "/usr/local/bin/yq"
+    mode: "0755"
+  when:
+    - yq_enabled | bool
+    - yq_check.rc != 0
+
+# httpie, nicer http client
+- name: "[devops-tools] Check if httpie is installed"
+  ansible.builtin.command: http --version
+  register: httpie_check
+  failed_when: false
+  changed_when: false
+  when: httpie_enabled | bool
+
+- name: "[devops-tools] Download httpie binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/httpie/cli/releases/latest/download/http-linux-x86_64.tar.gz"
+    dest: "/tmp/httpie.tar.gz"
+    mode: "0644"
+  when:
+    - httpie_enabled | bool
+    - httpie_check.rc != 0
+
+- name: "[devops-tools] Extract httpie"
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/httpie.tar.gz"
+    dest: "/tmp"
+    remote_src: true
+  when:
+    - httpie_enabled | bool
+    - httpie_check.rc != 0
+
+- name: "[devops-tools] Install httpie"
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/http"
+    dest: "/usr/local/bin/http"
+    mode: "0755"
+    remote_src: true
+  when:
+    - httpie_enabled | bool
+    - httpie_check.rc != 0
+
+- name: "[devops-tools] Clean up httpie installation"
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/httpie.tar.gz"
+    - "/tmp/http"
+  when:
+    - httpie_enabled | bool
+    - httpie_check.rc != 0

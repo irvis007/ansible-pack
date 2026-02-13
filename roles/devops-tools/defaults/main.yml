@@ -1,0 +1,75 @@
+# DevOps tools Role defaults
+#
+# ============================================================================
+# Versions managers
+# ============================================================================
+# install asdf version manager - used to install other tools, like terraform
+devops_install_version_managers: true
+
+# Flags for individual tools
+asdf_enabled: true
+direnv_enabled: true
+
+# asdf config
+asdf_version: "v0.18.0"
+asdf_install_dir: "{{ ansible_env.HOME }}/.asdf"
+asdf_plugins: []
+
+# ============================================================================
+# Cloud tools
+# ============================================================================
+devops_install_cloud_tools: true
+awscli_install_method: "official"
+
+# Flags for individual tools
+awscli_enabled: true
+awscli_update: false # set true if you already have AWS cli installed an want to update only
+aws_vault_enabled: false
+ssm_plugin_enabled: true
+
+# ============================================================================
+# Container tools
+# ============================================================================
+devops_install_containers: true
+docker_install_method: "official"
+docker_users: ["{{ ansible_user_id }}"]
+
+# Flags for individual tools
+docker_enabled: true
+docker_compose_enabled: true
+ctop_enabled: true
+dive_enabled: true
+
+# ============================================================================
+# IaC tools
+# ============================================================================
+devops_install_iac_tools: true
+terraform_version: "latest"
+terragrunt_version: "latest"
+ansiblle_version: "latest"
+
+# Flags for individual tools
+terraform_enabled: true
+terragrunt_enabled: true
+ansible_enabled: true
+
+# ============================================================================
+# Security tools
+# ============================================================================
+devops_install_security_tools: true
+
+# Flags for individual tools
+gpg_enabled: true
+keepassxc_enabled: true
+sops_enabled: false
+age_enabled: false
+
+# ============================================================================
+# Utilities
+# ============================================================================
+devops_install_utilities: true
+
+mc_enabled: true
+p7zip_enabled: true
+yq_enabled: true
+httpie_enabled: true
