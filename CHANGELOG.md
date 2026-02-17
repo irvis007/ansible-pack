@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/irvis007/ansible-pack/compare/v1.5.1...v1.5.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* **zsh:** Fix for zoxide not loading ([38e2e0a](https://github.com/irvis007/ansible-pack/commit/38e2e0a81bc3dff89fa38aae57d17adbe025487f))
+
 ## [1.5.1](https://github.com/irvis007/ansible-pack/compare/v1.5.0...v1.5.1) (2026-02-17)
 
 
