@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/irvis007/ansible-pack/compare/v1.4.1...v1.4.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* **nvim:** Fix for nvim role ([96192b4](https://github.com/irvis007/ansible-pack/commit/96192b442223dec92b33990e894cfd6c83f44df8))
+
 ## [1.4.1](https://github.com/irvis007/ansible-pack/compare/v1.4.0...v1.4.1) (2026-02-17)
 
 
