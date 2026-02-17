@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/irvis007/ansible-pack/compare/v1.4.5...v1.5.0) (2026-02-17)
+
+
+### Features
+
+* **applications:** Adds new role ([3515579](https://github.com/irvis007/ansible-pack/commit/351557955ef9de3a2cb984f4e73d962cbacd93fe))
+
 ## [1.4.5](https://github.com/irvis007/ansible-pack/compare/v1.4.4...v1.4.5) (2026-02-17)
 
 
