@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/irvis007/ansible-pack/compare/v1.3.0...v1.4.0) (2026-02-17)
+
+
+### Features
+
+* **devops-tools:** Add new role for repository ([7abd413](https://github.com/irvis007/ansible-pack/commit/7abd413a765dda4edfd935ef4bb61c3b6bfee9cd))
+
 # [1.3.0](https://github.com/irvis007/ansible-pack/compare/v1.2.0...v1.3.0) (2026-02-11)
 
 
