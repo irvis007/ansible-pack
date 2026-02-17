@@ -31,6 +31,14 @@
     remote_src: yes
   when: nvim_check.rc != 0
 
+- name: "[nvim] Ensure /usr/local/bin directory exists"
+  become: true
+  ansible.builtin.file:
+    path: "/usr/local/bin"
+    state: directory
+    mode: "0755"
+  when: nvim_check.rc != 0
+
 - name: "[nvim] Create symlink for nvim binary"
   become: true
   ansible.builtin.file:
@@ -38,6 +46,15 @@
     dest: "/usr/local/bin/nvim"
     state: link
     force: yes
+  when: nvim_check.rc != 0
+
+- name: "[nvim] Ensure /usr/local/bin is in system PATH"
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/usr-local-bin.sh
+    line: 'export PATH="/usr/local/bin:$PATH"'
+    create: yes
+    mode: "0644"
   when: nvim_check.rc != 0
 
 - name: "[nvim] Cleanup downloaded tarball"
@@ -48,7 +65,7 @@
   when: nvim_check.rc != 0
 
 - name: "[nvim] Verify Neovim installation"
-  ansible.builtin.command: nvim --version
+  ansible.builtin.command: /usr/local/bin/nvim --version
   register: nvim_version
   changed_when: false
 
