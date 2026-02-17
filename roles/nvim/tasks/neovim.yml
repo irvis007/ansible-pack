@@ -15,12 +15,11 @@
     mode: "0644"
   when: nvim_check.rc != 0
 
-- name: "[nvim] Create /opt/nvim-linux64 directory"
+- name: "[nvim] Remove old nvim-linux64 directory if exists"
   become: true
   ansible.builtin.file:
     path: "/opt/nvim-linux64"
-    state: directory
-    mode: "0755"
+    state: absent
   when: nvim_check.rc != 0
 
 - name: "[nvim] Extract Neovim pre-built binary"
@@ -42,9 +41,10 @@
 - name: "[nvim] Create symlink for nvim binary"
   become: true
   ansible.builtin.file:
-    src: "/opt/nvim-linux64/bin/nvim"
+    src: "/opt/nvim-linux-x86_64/bin/nvim"
     dest: "/usr/local/bin/nvim"
     state: link
+    follow: false
     force: yes
   when: nvim_check.rc != 0
 
