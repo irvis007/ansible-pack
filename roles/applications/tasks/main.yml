@@ -1,0 +1,27 @@
+---
+# Applications Role - Main Orchestrator
+# Installs desktop applications (no snap!)
+
+# ============================================================================
+# Step 1: Install Browsers (Floorp, Brave)
+# ============================================================================
+- name: "[applications] Install browsers"
+  include_tasks: browsers.yml
+  when: applications_install_browsers | bool
+  tags: ['applications', 'browsers']
+
+# ============================================================================
+# Step 2: Install Communication Tools (Teams, Slack)
+# ============================================================================
+- name: "[applications] Install communication tools"
+  include_tasks: communication.yml
+  when: applications_install_communication | bool
+  tags: ['applications', 'communication']
+
+# ============================================================================
+# Step 3: Install Productivity Tools (Nextcloud, Obsidian, Pomotroid)
+# ============================================================================
+- name: "[applications] Install productivity tools"
+  include_tasks: productivity.yml
+  when: applications_install_productivity | bool
+  tags: ['applications', 'productivity']

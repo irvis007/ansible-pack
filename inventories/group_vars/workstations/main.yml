@@ -7,6 +7,22 @@ install_utilities: true
 install_zsh: true
 install_astronvim: true
 install_fonts: true
+install_applications: true
+
+# Granular applications control (optional - uncomment to override)
+# By default, all applications are installed when install_applications: true
+# Uncomment individual flags to selectively disable/enable specific apps:
+# applications_install_browsers: true
+# applications_install_communication: true
+# applications_install_productivity: true
+# Per-application toggles:
+# floorp_enabled: true
+# brave_enabled: true
+# teams_enabled: true
+# slack_enabled: true
+# nextcloud_enabled: true
+# obsidian_enabled: true
+# pomotroid_enabled: true
 
 # Granular utilities control (optional - uncomment to override)
 # By default, all tools are installed when install_utilities: true
@@ -21,15 +37,17 @@ install_fonts: true
 # utilities_install_lazygit: false  # Example: disable lazygit
 
 # DevOps tools (optional, enable for work machines)
-devops_tools_enabled: false
-devops_tools_install_docker: false
-devops_tools_install_terragrunt: false
-devops_tools_install_tenv: false
+install_devops_tools: false
 
-# Cloud tools (optional)
-cloud_tools_enabled: false
-cloud_tools_install_kubectl: false
-cloud_tools_install_aws_cli: false
+# Granular devops-tools control (optional - uncomment to override)
+# By default, all tool categories are installed when install_devops_tools: true
+# Uncomment individual flags to selectively disable/enable specific categories:
+# devops_install_version_managers: true  # asdf, direnv
+# devops_install_cloud_tools: true       # aws-cli
+# devops_install_containers: true        # docker, docker-compose, ctop, dive
+# devops_install_iac_tools: true         # terraform, terragrunt, ansible
+# devops_install_security_tools: true    # gpg, keepassxc, sops, age
+# devops_install_utilities: true         # mc, p7zip, yq, httpie
 
 # Security - Minimal for workstations
 apply_hardening: false
