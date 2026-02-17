@@ -1,0 +1,32 @@
+---
+# Install fzf (fuzzy finder)
+
+- name: Check if fzf is already installed
+  ansible.builtin.shell: fzf --version
+  register: fzf_rc
+  failed_when: false
+  changed_when: false
+
+- name: Clone fzf repository
+  ansible.builtin.git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: "{{ ansible_env.HOME }}/.fzf"
+    depth: 1
+    version: master
+  when: fzf_rc.rc != 0
+
+- name: Install fzf
+  ansible.builtin.command:
+    cmd: "{{ ansible_env.HOME }}/.fzf/install --bin"
+    creates: "{{ ansible_env.HOME }}/.fzf/bin/fzf"
+  when: fzf_rc.rc != 0
+
+- name: Create symlink for fzf in /usr/local/bin
+  become: true
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.fzf/bin/fzf"
+    dest: "/usr/local/bin/fzf"
+    state: link
+    follow: false
+    force: yes
+  when: fzf_rc.rc != 0
