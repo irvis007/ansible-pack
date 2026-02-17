@@ -10,9 +10,9 @@
 - name: "[nvim] Download Neovim pre-built binary (latest stable)"
   become: true
   ansible.builtin.get_url:
-    url: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz"
+    url: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
     dest: "/tmp/nvim-linux64.tar.gz"
-    mode: '0644'
+    mode: "0644"
   when: nvim_check.rc != 0
 
 - name: "[nvim] Create /opt/nvim-linux64 directory"
@@ -20,7 +20,7 @@
   ansible.builtin.file:
     path: "/opt/nvim-linux64"
     state: directory
-    mode: '0755'
+    mode: "0755"
   when: nvim_check.rc != 0
 
 - name: "[nvim] Extract Neovim pre-built binary"
