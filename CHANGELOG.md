@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/irvis007/ansible-pack/compare/v1.4.4...v1.4.5) (2026-02-17)
+
+
+### Bug Fixes
+
+* **zsh:** Fix for unassigned user ([fa0e6c3](https://github.com/irvis007/ansible-pack/commit/fa0e6c308126e750f24ed8cb43dd17cbd7f6716a))
+
 ## [1.4.4](https://github.com/irvis007/ansible-pack/compare/v1.4.3...v1.4.4) (2026-02-17)
 
 
