@@ -40,6 +40,10 @@
       tags: ["devops-tools", "devtools"]
       when: install_devops_tools | default(true)
 
+    - role: applications
+      tags: ["applications", "desktop-apps", "gui"]
+      when: install_applications | default(true)
+
     - role: nvim
       tags: ["nvim", "editor", "astronvim"]
       when: install_astronvim | default(true)
@@ -59,6 +63,8 @@
           Installed components:
           - Fonts: {{ 'Yes' if install_fonts | default(true) else 'No' }}
           - CLI Utilities: {{ 'Yes' if install_utilities | default(true) else 'No' }}
+          - DevOps Tools: {{ 'Yes' if install_devops_tools | default(true) else 'No' }}
+          - Applications: {{ 'Yes' if install_applications | default(true) else 'No' }}
           - Neovim/AstroVim: {{ 'Yes' if install_astronvim | default(true) else 'No' }}
           - ZSH: {{ 'Yes' if install_zsh | default(true) else 'No' }}
 

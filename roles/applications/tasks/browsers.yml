@@ -1,0 +1,56 @@
+---
+# Install web browsers (no snap!)
+
+# ============================================================================
+# Floorp - Firefox-based privacy browser
+# ============================================================================
+- name: "[applications] Add Floorp GPG key"
+  become: true
+  ansible.builtin.get_url:
+    url: https://ppa.ablaze.one/KEY.gpg
+    dest: /usr/share/keyrings/floorp.gpg
+    mode: '0644'
+  when: floorp_enabled | bool
+
+- name: "[applications] Add Floorp repository"
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/floorp.gpg] https://ppa.ablaze.one/ {{ ansible_distribution_release }} main"
+    filename: floorp
+    state: present
+  when: floorp_enabled | bool
+
+- name: "[applications] Install Floorp"
+  become: true
+  ansible.builtin.apt:
+    name: floorp
+    state: present
+    update_cache: yes
+  when: floorp_enabled | bool
+
+# ============================================================================
+# Brave - Privacy-focused browser
+# ============================================================================
+- name: "[applications] Add Brave GPG key"
+  become: true
+  ansible.builtin.get_url:
+    url: https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+    dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+    mode: '0644'
+  when: brave_enabled | bool
+
+- name: "[applications] Add Brave repository"
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"
+    filename: brave-browser
+    state: present
+  when: brave_enabled | bool
+
+- name: "[applications] Install Brave"
+  become: true
+  ansible.builtin.apt:
+    name: brave-browser
+    state: present
+    update_cache: yes
+  when: brave_enabled | bool

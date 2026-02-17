@@ -1,0 +1,48 @@
+---
+# Install communication tools (no snap!)
+
+# ============================================================================
+# Microsoft Teams
+# ============================================================================
+- name: "[applications] Download MS Teams deb package"
+  ansible.builtin.get_url:
+    url: https://go.microsoft.com/fwlink/p/?LinkID=2112886&clcid=0x409&culture=en-us&country=us
+    dest: /tmp/teams.deb
+    mode: '0644'
+  when: teams_enabled | bool
+
+- name: "[applications] Install MS Teams"
+  become: true
+  ansible.builtin.apt:
+    deb: /tmp/teams.deb
+    state: present
+  when: teams_enabled | bool
+
+- name: "[applications] Cleanup Teams deb package"
+  ansible.builtin.file:
+    path: /tmp/teams.deb
+    state: absent
+  when: teams_enabled | bool
+
+# ============================================================================
+# Slack
+# ============================================================================
+- name: "[applications] Download Slack deb package"
+  ansible.builtin.get_url:
+    url: https://downloads.slack-edge.com/releases/linux/4.38.125/prod/x64/slack-desktop-4.38.125-amd64.deb
+    dest: /tmp/slack.deb
+    mode: '0644'
+  when: slack_enabled | bool
+
+- name: "[applications] Install Slack"
+  become: true
+  ansible.builtin.apt:
+    deb: /tmp/slack.deb
+    state: present
+  when: slack_enabled | bool
+
+- name: "[applications] Cleanup Slack deb package"
+  ansible.builtin.file:
+    path: /tmp/slack.deb
+    state: absent
+  when: slack_enabled | bool

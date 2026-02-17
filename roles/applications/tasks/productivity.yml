@@ -1,0 +1,105 @@
+---
+# Install productivity tools (no snap!)
+
+# ============================================================================
+# Setup: Create AppImage directories
+# ============================================================================
+- name: "[applications] Create AppImage directory"
+  become: true
+  ansible.builtin.file:
+    path: "{{ appimage_install_dir }}"
+    state: directory
+    mode: '0755'
+  when: obsidian_enabled | bool or pomotroid_enabled | bool
+
+# ============================================================================
+# Nextcloud Desktop Client
+# ============================================================================
+- name: "[applications] Add Nextcloud GPG key"
+  become: true
+  ansible.builtin.get_url:
+    url: https://download.opensuse.org/repositories/isv:ownCloud:desktop/xUbuntu_22.04/Release.key
+    dest: /usr/share/keyrings/nextcloud-desktop.asc
+    mode: '0644'
+  when: nextcloud_enabled | bool
+
+- name: "[applications] Add Nextcloud repository"
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nextcloud-desktop.asc] https://download.opensuse.org/repositories/isv:/ownCloud:/desktop/xUbuntu_22.04/ /"
+    filename: nextcloud-desktop
+    state: present
+  when: nextcloud_enabled | bool
+
+- name: "[applications] Install Nextcloud Desktop"
+  become: true
+  ansible.builtin.apt:
+    name: nextcloud-desktop
+    state: present
+    update_cache: yes
+  when: nextcloud_enabled | bool
+
+# ============================================================================
+# Obsidian - Note-taking app (AppImage)
+# ============================================================================
+- name: "[applications] Check if Obsidian is installed"
+  ansible.builtin.stat:
+    path: "{{ appimage_install_dir }}/Obsidian.AppImage"
+  register: obsidian_check
+  when: obsidian_enabled | bool
+
+- name: "[applications] Download Obsidian AppImage"
+  become: true
+  ansible.builtin.get_url:
+    url: https://github.com/obsidianmd/obsidian-releases/releases/latest/download/Obsidian-{{ obsidian_version }}.AppImage
+    dest: "{{ appimage_install_dir }}/Obsidian.AppImage"
+    mode: '0755'
+  when:
+    - obsidian_enabled | bool
+    - not obsidian_check.stat.exists
+
+- name: "[applications] Create Obsidian symlink"
+  become: true
+  ansible.builtin.file:
+    src: "{{ appimage_install_dir }}/Obsidian.AppImage"
+    dest: "{{ appimage_bin_dir }}/obsidian"
+    state: link
+    follow: false
+  when: obsidian_enabled | bool
+
+# ============================================================================
+# Pomotroid - Pomodoro timer (AppImage from GitHub)
+# ============================================================================
+- name: "[applications] Check if Pomotroid is installed"
+  ansible.builtin.stat:
+    path: "{{ appimage_install_dir }}/Pomotroid.AppImage"
+  register: pomotroid_check
+  when: pomotroid_enabled | bool
+
+- name: "[applications] Get latest Pomotroid version"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/Splode/pomotroid/releases/latest
+    return_content: true
+  register: pomotroid_latest
+  when:
+    - pomotroid_enabled | bool
+    - not pomotroid_check.stat.exists
+
+- name: "[applications] Download Pomotroid AppImage"
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/Splode/pomotroid/releases/download/{{ pomotroid_latest.json.tag_name }}/Pomotroid-{{ pomotroid_latest.json.tag_name | regex_replace('^v', '') }}-linux-x86_64.AppImage"
+    dest: "{{ appimage_install_dir }}/Pomotroid.AppImage"
+    mode: '0755'
+  when:
+    - pomotroid_enabled | bool
+    - not pomotroid_check.stat.exists
+
+- name: "[applications] Create Pomotroid symlink"
+  become: true
+  ansible.builtin.file:
+    src: "{{ appimage_install_dir }}/Pomotroid.AppImage"
+    dest: "{{ appimage_bin_dir }}/pomotroid"
+    state: link
+    follow: false
+  when: pomotroid_enabled | bool
