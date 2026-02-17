@@ -1,0 +1,8 @@
+---
+# ZSH Role Defaults
+
+# User whose shell will be changed to zsh
+zsh_local_user: "{{ ansible_user_id }}"
+
+# Copy dotfiles (zshrc, etc)
+copy_dot_files: true
