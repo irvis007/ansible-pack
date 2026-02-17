@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/irvis007/ansible-pack/compare/v1.5.0...v1.5.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* **zsh:** This will fix zsh issue ([e484962](https://github.com/irvis007/ansible-pack/commit/e4849628eb5565a1e3fd8197ffa54d3615c742eb))
+
 # [1.5.0](https://github.com/irvis007/ansible-pack/compare/v1.4.5...v1.5.0) (2026-02-17)
 
 
