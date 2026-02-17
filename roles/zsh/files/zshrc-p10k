@@ -72,6 +72,9 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
+# FZF configuration - set base path for fzf plugin
+export FZF_BASE="$HOME/.fzf"
+
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
@@ -93,6 +96,11 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
+
+# Initialize zoxide (smarter cd)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
 
 # Aliases with eza
 alias l='eza -lah --color=always --icons --group-directories-first' # with headers

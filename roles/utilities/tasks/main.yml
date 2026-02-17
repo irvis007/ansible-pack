@@ -31,6 +31,11 @@
   when: utilities_install_dust | bool
   tags: ['utilities', 'dust']
 
+- name: Include fzf installation
+  include_tasks: fzf.yml
+  when: utilities_install_fzf | bool
+  tags: ['utilities', 'fzf']
+
 - name: Include zoxide installation
   include_tasks: zoxide.yml
   when: utilities_install_zoxide | bool

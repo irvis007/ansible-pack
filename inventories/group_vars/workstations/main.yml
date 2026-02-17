@@ -32,6 +32,7 @@ install_applications: true
 # utilities_install_fd: true
 # utilities_install_ripgrep: true
 # utilities_install_dust: true
+# utilities_install_fzf: true
 # utilities_install_zoxide: true
 # utilities_install_tmux: true
 # utilities_install_lazygit: false  # Example: disable lazygit
