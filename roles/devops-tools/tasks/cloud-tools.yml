@@ -1,0 +1,66 @@
+# Install cloud tools
+
+# ============================================================================
+# AWS CLI , v2
+# ============================================================================
+- name: "[devops-tools] Check if AWS cli v2 is already installed"
+  ansible.builtin.command: aws --version
+  register: awscli_check
+  failed_when: false
+  changed_when: false
+  when: awscli_enabled | bool
+
+# set fact: Decision - install vs update
+- name: "[devops-tools] Determine if AWS cli v2 installation needed"
+  ansible.builtin.set_fact:
+    awscli_install_needed: "{{ awscli_check.rc != 0 or awscli_update | bool }}"
+  when: awscli_enabled | bool
+
+- name: "[devops-tools] Download AWS cli v2 installer"
+  ansible.builtin.get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: "0644"
+  when:
+    - awscli_enabled | bool
+    - awscli_install_needed | bool
+
+- name: "[devops-tools] Extract AWS cli v2 installer"
+  ansible.builtin.unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes
+  when:
+    - awscli_enabled | bool
+    - awscli_install_needed | bool
+
+- name: "[devops-tools] Install AWS cli v2 -- fresh install"
+  become: true
+  ansible.builtin.command:
+    cmd: /tmp/aws/install
+    creates: /usr/local/bin/aws
+  when:
+    - awscli_enabled | bool
+    - awscli_check.rc != 0
+
+- name: "[devops-tools] Update AWS cli v2 -- update only"
+  become: true
+  ansible.builtin.command:
+    cmd: /tmp/aws/install --update
+  when:
+    - awscli_enabled | bool
+    - awscli_check.rc == 0
+    - awscli_update | bool
+  register: awscli_update_result
+  changed_when: "'You can now run' in awscli_update_result.stdout"
+
+- name: "[devops-tools] Cleanup AWS cli v2 tmp files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/awscliv2.zip
+    - /tmp/aws
+  when:
+    - awscli_enabled | bool
+    - awscli_install_needed | bool

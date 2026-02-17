@@ -1,0 +1,49 @@
+# DevOps tools role - orchestrator
+
+# ============================================================================
+# Step 1: Install versions managers
+# ============================================================================
+- name: "[devops-tools] install version managers"
+  include_tasks: version-managers.yml
+  when: devops_install_version_managers | bool
+  tags: ["devops-tools", "version-managers"]
+
+# ============================================================================
+# Step 2: Install cloud tools
+# ============================================================================
+- name: "[devops-tools] install cloud tools"
+  include_tasks: cloud-tools.yml
+  when: devops_install_cloud_tools | bool
+  tags: ["devops-tools", "cloud-tools"]
+
+# ============================================================================
+# Step 3: Install container tools
+# ============================================================================
+- name: "[devops-tools] install container tools"
+  include_tasks: containers.yml
+  when: devops_install_containers | bool
+  tags: ["devops-tools", "containers"]
+
+# ============================================================================
+# Step 4: Install IaC tools
+# ============================================================================
+- name: "[devops-tools] install IaC tools"
+  include_tasks: iac-tools.yml
+  when: devops_install_iac_tools | bool
+  tags: ["devops-tools", "iac-tools"]
+
+# ============================================================================
+# Step 5: Install security tools
+# ============================================================================
+- name: "[devops-tools] install security tools"
+  include_tasks: security-tools.yml
+  when: devops_install_security_tools | bool
+  tags: ["devops-tools", "security-tools"]
+
+# ============================================================================
+# Step 6: Install utilities
+# ============================================================================
+- name: "[devops-tools] install utilities"
+  include_tasks: utilities.yml
+  when: devops_install_utilities | bool
+  tags: ["devops-tools", "utilities"]

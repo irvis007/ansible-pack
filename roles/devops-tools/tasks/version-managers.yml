@@ -1,0 +1,65 @@
+# Install versions managers
+
+# ============================================================================
+# asdf - Universal version manager
+# ============================================================================
+- name: "[devops-tools] Check if asdf is already installed"
+  ansible.builtin.stat:
+    path: "{{ asdf_install_dir }}"
+  register: asdf_dir
+  when: asdf_enabled | bool
+
+- name: "[devops-tools] Clone asdf repo"
+  ansible.builtin.git:
+    repo: "https://github.com/asdf-vm/asdf.git"
+    dest: "{{ asdf_install_dir }}"
+    version: "{{ asdf_version }}"
+    depth: 1
+  when:
+    - asdf_enabled | bool
+    - not asdf_dir.stat.exists
+
+- name: "[devops-tools] Add asdf to bash config"
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    create: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - asdf"
+    block: |
+      . "$HOME/.asdf/asdf.sh"
+      . "$HOME/.asdf/completions/asdf.bash"
+  when:
+    - asdf_enabled | bool
+    - not asdf_dir.stat.exists
+
+- name: "[devops-tools] Add asdf to zsh config"
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    create: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - asdf"
+    block: |
+      . "$HOME/.asdf/asdf.sh"
+      . "$HOME/.asdf/completions/asdf.zsh"
+  when:
+    - asdf_enabled | bool
+    - not asdf_dir.stat.exists
+
+- name: "[devops-tools] Install direnv"
+  become: true
+  ansible.builtin.package:
+    name: direnv
+    state: present
+  when: direnv_enabled | bool
+
+- name: "[devops-tools] Add direnv hook to bash"
+  ansible.builtin.lineinfile:
+    create: yes
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'eval "$(direnv hook bash)"'
+  when: direnv_enabled | bool
+
+- name: "[devops-tools] Add direnv hook to zsh"
+  ansible.builtin.lineinfile:
+    create: yes
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    line: 'eval "$(direnv hook zsh)"'
+  when: direnv_enabled | bool

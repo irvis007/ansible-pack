@@ -29,19 +29,23 @@
 
   roles:
     - role: fonts
-      tags: ['fonts', 'nerdfonts']
+      tags: ["fonts", "nerdfonts"]
       when: install_fonts | default(true)
 
     - role: utilities
-      tags: ['utilities', 'cli-tools']
+      tags: ["utilities", "cli-tools"]
       when: install_utilities | default(true)
 
+    - role: devops-tools
+      tags: ["devops-tools", "devtools"]
+      when: install_devops_tools | default(true)
+
     - role: nvim
-      tags: ['nvim', 'editor', 'astronvim']
+      tags: ["nvim", "editor", "astronvim"]
       when: install_astronvim | default(true)
 
     - role: zsh
-      tags: ['zsh', 'shell']
+      tags: ["zsh", "shell"]
       when: install_zsh | default(true)
 
   post_tasks:
@@ -66,5 +70,5 @@
 
     - name: Remind about shell change
       ansible.builtin.debug:
-        msg: "⚠️  If ZSH was installed, logout and login again for shell changes to take effect."
+        msg: " If ZSH was installed, logout and login again for shell changes to take effect."
       when: install_zsh | default(true)
