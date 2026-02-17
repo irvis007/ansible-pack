@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/irvis007/ansible-pack/compare/v1.4.0...v1.4.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* **nvim:** Fix for MX linux ([aaafad4](https://github.com/irvis007/ansible-pack/commit/aaafad471774e4a394a0279b4399b48e8509b13d))
+
 # [1.4.0](https://github.com/irvis007/ansible-pack/compare/v1.3.0...v1.4.0) (2026-02-17)
 
 
