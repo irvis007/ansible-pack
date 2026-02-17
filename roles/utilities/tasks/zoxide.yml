@@ -1,12 +1,11 @@
 ---
 # Install zoxide (smarter cd command)
 
-- name: Check if zoxide is already installed (Debian)
+- name: Check if zoxide is already installed
   ansible.builtin.shell: zoxide --version
   register: zoxide_rc
   failed_when: false
   changed_when: false
-  when: ansible_os_family == 'Debian'
 
 - name: Download zoxide installer script
   ansible.builtin.get_url:
@@ -14,7 +13,7 @@
     dest: /tmp/zoxide-install.sh
     mode: '0755'
   become: true
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
+  when: zoxide_rc.rc != 0
 
 - name: Install zoxide
   become: true
@@ -23,11 +22,11 @@
     creates: /usr/local/bin/zoxide
   environment:
     SHELL: /bin/bash
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
+  when: zoxide_rc.rc != 0
 
 - name: Cleanup zoxide installer
   ansible.builtin.file:
     path: /tmp/zoxide-install.sh
     state: absent
   become: true
-  when: ansible_os_family == 'Debian' and zoxide_rc.rc != 0
+  when: zoxide_rc.rc != 0
