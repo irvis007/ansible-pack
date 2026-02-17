@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/irvis007/ansible-pack/compare/v1.4.2...v1.4.3) (2026-02-17)
+
+
+### Bug Fixes
+
+* **nvim:** Fix for nvim ([6d5c02e](https://github.com/irvis007/ansible-pack/commit/6d5c02eee346682b822a14d5483793524bdd7c61))
+
 ## [1.4.2](https://github.com/irvis007/ansible-pack/compare/v1.4.1...v1.4.2) (2026-02-17)
 
 
