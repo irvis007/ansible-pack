@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/irvis007/ansible-pack/compare/v1.4.3...v1.4.4) (2026-02-17)
+
+
+### Bug Fixes
+
+* **nvim:** Fix for failing post installation check in MX Linux ([96937c7](https://github.com/irvis007/ansible-pack/commit/96937c79a2cd440ed09677f885687cfc31c58f7e))
+
 ## [1.4.3](https://github.com/irvis007/ansible-pack/compare/v1.4.2...v1.4.3) (2026-02-17)
 
 
