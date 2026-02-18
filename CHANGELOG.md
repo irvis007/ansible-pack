@@ -1,3 +1,11 @@
+## [1.5.3](https://github.com/irvis007/ansible-pack/compare/v1.5.2...v1.5.3) (2026-02-18)
+
+
+### Bug Fixes
+
+* **zoxide:** Fix for MX Linux ([1b774ef](https://github.com/irvis007/ansible-pack/commit/1b774efb9eb5eb4c18ba44e60dabbe60e1f75327))
+* **zsh:** Fix for zoxide ([46dee61](https://github.com/irvis007/ansible-pack/commit/46dee61755cf599fa61d821294050ad7659a4968))
+
 ## [1.5.3](https://github.com/irvis007/ansible-pack/compare/v1.5.2...v1.5.3) (2026-02-17)
 
 
