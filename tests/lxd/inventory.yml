@@ -26,6 +26,14 @@ all:
               install_nvim: true
               install_zsh: true
 
+            test-debian-zoxide:
+              ansible_host: test-debian-zoxide
+              lxd_image: images:debian/13
+              install_utilities: true
+              install_zsh: false
+              install_nvim: false
+              install_docker: false
+
         test_servers:
           hosts:
             test-server-ubuntu:
