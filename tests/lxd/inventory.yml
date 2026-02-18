@@ -34,6 +34,16 @@ all:
               install_nvim: false
               install_docker: false
 
+            test-floorp:
+              ansible_host: test-floorp
+              lxd_image: images:debian/13
+              install_applications: true
+              applications_install_browsers: true
+              applications_install_communication: false
+              applications_install_productivity: false
+              floorp_enabled: true
+              brave_enabled: false
+
         test_servers:
           hosts:
             test-server-ubuntu:
