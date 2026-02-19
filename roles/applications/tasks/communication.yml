@@ -2,47 +2,50 @@
 # Install communication tools (no snap!)
 
 # ============================================================================
-# Microsoft Teams
+# Teams for Linux - Unofficial Microsoft Teams client
+# Repository: https://github.com/IsmaelMartinez/teams-for-linux
 # ============================================================================
-- name: "[applications] Download MS Teams deb package"
+- name: "[applications] Ensure /etc/apt/keyrings directory exists"
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: teams_enabled | bool
+
+- name: "[applications] Download Teams for Linux GPG key"
+  become: true
   ansible.builtin.get_url:
-    url: https://go.microsoft.com/fwlink/p/?LinkID=2112886&clcid=0x409&culture=en-us&country=us
-    dest: /tmp/teams.deb
+    url: https://repo.teamsforlinux.de/teams-for-linux.asc
+    dest: /etc/apt/keyrings/teams-for-linux.asc
     mode: '0644'
   when: teams_enabled | bool
 
-- name: "[applications] Install MS Teams"
+- name: "[applications] Add Teams for Linux repository"
   become: true
-  ansible.builtin.apt:
-    deb: /tmp/teams.deb
-    state: present
-  when: teams_enabled | bool
-
-- name: "[applications] Cleanup Teams deb package"
-  ansible.builtin.file:
-    path: /tmp/teams.deb
-    state: absent
-  when: teams_enabled | bool
-
-# ============================================================================
-# Slack
-# ============================================================================
-- name: "[applications] Download Slack deb package"
-  ansible.builtin.get_url:
-    url: https://downloads.slack-edge.com/releases/linux/4.38.125/prod/x64/slack-desktop-4.38.125-amd64.deb
-    dest: /tmp/slack.deb
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/teams-for-linux-packages.sources
     mode: '0644'
-  when: slack_enabled | bool
+    content: |
+      Types: deb
+      URIs: https://repo.teamsforlinux.de/debian/
+      Suites: stable
+      Components: main
+      Signed-By: /etc/apt/keyrings/teams-for-linux.asc
+      Architectures: amd64
+  when: teams_enabled | bool
 
-- name: "[applications] Install Slack"
+- name: "[applications] Install Teams for Linux"
   become: true
   ansible.builtin.apt:
-    deb: /tmp/slack.deb
+    name: teams-for-linux
     state: present
-  when: slack_enabled | bool
+    update_cache: yes
+  when: teams_enabled | bool
 
-- name: "[applications] Cleanup Slack deb package"
-  ansible.builtin.file:
-    path: /tmp/slack.deb
-    state: absent
-  when: slack_enabled | bool
+# ============================================================================
+# Slack - Removed (not in use)
+# ============================================================================
+# To install Slack manually:
+# curl -O https://downloads.slack-edge.com/releases/linux/4.40.133/prod/x64/slack-desktop-4.40.133-amd64.deb
+# sudo apt install ./slack-desktop-*.deb

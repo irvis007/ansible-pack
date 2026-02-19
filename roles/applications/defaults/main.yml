@@ -1,14 +1,13 @@
 ---
 # Applications Role Defaults
 # Desktop applications for productivity and communication
-# Installation methods: Official repos (deb), AppImage - NO SNAP!
 
 # ============================================================================
 # Browsers
 # ============================================================================
 applications_install_browsers: true
 
-# Floorp - Firefox-based privacy browser
+# Floorp
 floorp_enabled: true
 
 # Brave - Privacy-focused browser
@@ -20,10 +19,11 @@ brave_enabled: true
 applications_install_communication: true
 
 # Microsoft Teams
+# Repository: https://github.com/IsmaelMartinez/teams-for-linux
 teams_enabled: true
 
 # Slack
-slack_enabled: true
+slack_enabled: false
 
 # ============================================================================
 # Productivity Tools
