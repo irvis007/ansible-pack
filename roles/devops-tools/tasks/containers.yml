@@ -77,7 +77,7 @@
 
 - name: "[devops-tools] Enable and start Docker service"
   become: true
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: docker
     state: started
     enabled: yes
