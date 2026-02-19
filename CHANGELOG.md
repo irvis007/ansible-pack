@@ -1,3 +1,11 @@
+## [1.5.4](https://github.com/irvis007/ansible-pack/compare/v1.5.3...v1.5.4) (2026-02-19)
+
+
+### Bug Fixes
+
+* **applications:** Fix failing role for MX Linux ([97f9577](https://github.com/irvis007/ansible-pack/commit/97f9577439390e88eb46281d52466b8d2daff277))
+* **applications:** Fix for Floorp installation ([10dc50c](https://github.com/irvis007/ansible-pack/commit/10dc50cdd3b744481c3bdb2c14963afc350de0a3))
+
 ## [1.5.3](https://github.com/irvis007/ansible-pack/compare/v1.5.2...v1.5.3) (2026-02-18)
 
 
