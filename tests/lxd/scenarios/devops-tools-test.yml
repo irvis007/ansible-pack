@@ -1,0 +1,16 @@
+---
+# DevOps Tools Test Playbook
+# Tests devops-tools role installation on LXD containers
+
+- name: Test DevOps Tools Role
+  hosts: test-devops
+  gather_facts: true
+  become: false
+
+  vars:
+    # Disable Docker in LXD containers (not supported)
+    devops_install_containers: false
+
+  roles:
+    - role: devops-tools
+      tags: ["devops-tools"]

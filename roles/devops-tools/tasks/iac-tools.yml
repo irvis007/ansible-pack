@@ -1,6 +1,17 @@
 # Install IaC tools
 
 # ============================================================================
+# Dependencies
+# ============================================================================
+- name: "[devops-tools] Ensure gnupg is installed for signature verification"
+  become: true
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+    update_cache: no
+  when: terragrunt_enabled | bool or terraform_enabled | bool
+
+# ============================================================================
 # Terraform, requieres asdf first
 # ============================================================================
 - name: "[devops-tools] Check if TF plugin is available in asdf vm"

@@ -1,6 +1,19 @@
 # Install versions managers
 
 # ============================================================================
+# Dependencies
+# ============================================================================
+- name: "[devops-tools] Ensure git and curl are installed"
+  become: true
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+    state: present
+    update_cache: no
+  when: asdf_enabled | bool or direnv_enabled | bool
+
+# ============================================================================
 # asdf - Universal version manager
 # ============================================================================
 - name: "[devops-tools] Check if asdf is already installed"
