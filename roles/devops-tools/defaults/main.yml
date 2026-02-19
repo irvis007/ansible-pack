@@ -51,7 +51,7 @@ ansiblle_version: "latest"
 # Flags for individual tools
 terraform_enabled: true
 terragrunt_enabled: true
-ansible_enabled: true
+ansible_enabled: false
 
 # ============================================================================
 # Security tools
