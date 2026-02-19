@@ -1,3 +1,10 @@
+## [1.5.6](https://github.com/irvis007/ansible-pack/compare/v1.5.5...v1.5.6) (2026-02-19)
+
+
+### Bug Fixes
+
+* **containers:** Fix for not supported apt_key ([0d1268d](https://github.com/irvis007/ansible-pack/commit/0d1268d9eb806b2b10c0b018959789a6e308562a))
+
 ## [1.5.5](https://github.com/irvis007/ansible-pack/compare/v1.5.4...v1.5.5) (2026-02-19)
 
 
