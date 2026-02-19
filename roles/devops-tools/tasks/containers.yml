@@ -16,17 +16,41 @@
     state: present
   when: docker_enabled | bool
 
-- name: "[devops-tools] Add Docker GPG key"
+- name: "[devops-tools] Ensure /etc/apt/keyrings directory exists"
   become: true
-  ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
   when: docker_enabled | bool
 
-- name: "[devops-tools] Add Docker registry"
+- name: "[devops-tools] Download Docker GPG key"
+  become: true
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+    dest: /tmp/docker-key.gpg
+    mode: '0644'
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Dearmor and install Docker GPG key"
+  become: true
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker-key.gpg
+    creates: /etc/apt/keyrings/docker.gpg
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Cleanup temporary Docker GPG key"
+  become: true
+  ansible.builtin.file:
+    path: /tmp/docker-key.gpg
+    state: absent
+  when: docker_enabled | bool
+
+- name: "[devops-tools] Add Docker repository"
   become: true
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    filename: docker
     state: present
   when: docker_enabled | bool
 
