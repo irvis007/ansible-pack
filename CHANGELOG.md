@@ -1,3 +1,10 @@
+## [1.5.8](https://github.com/irvis007/ansible-pack/compare/v1.5.7...v1.5.8) (2026-02-19)
+
+
+### Bug Fixes
+
+* **ctop:** Fix for wrong url ([a5b9d81](https://github.com/irvis007/ansible-pack/commit/a5b9d812e3e9493f3f28426d2f06391f39a59245))
+
 ## [1.5.7](https://github.com/irvis007/ansible-pack/compare/v1.5.6...v1.5.7) (2026-02-19)
 
 
