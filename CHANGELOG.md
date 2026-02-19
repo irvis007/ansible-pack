@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/irvis007/ansible-pack/compare/v1.5.4...v1.5.5) (2026-02-19)
+
+
+### Bug Fixes
+
+* **devops-tools:** Fix for MX Linux installation ([6f663e5](https://github.com/irvis007/ansible-pack/commit/6f663e5e733bb3ecbe0d63a324ffc8e4b703a9e5))
+
 ## [1.5.4](https://github.com/irvis007/ansible-pack/compare/v1.5.3...v1.5.4) (2026-02-19)
 
 
