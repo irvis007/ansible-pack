@@ -101,7 +101,7 @@
 - name: "[devops-tools] Download ctop binary"
   become: true
   ansible.builtin.get_url:
-    url: "https://github.com/bcicen/ctop/releases/download/{{ ctop_latest.json.tag_name }}/ctop-{{ ctop_latest.json.tag_name }}-linux-amd64"
+    url: "https://github.com/bcicen/ctop/releases/download/{{ ctop_latest.json.tag_name }}/ctop-{{ ctop_latest.json.tag_name | regex_replace('^v', '') }}-linux-amd64"
     dest: "/usr/local/bin/ctop"
     mode: "0755"
   when:
