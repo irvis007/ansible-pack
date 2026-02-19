@@ -1,6 +1,17 @@
 # Install cloud tools
 
 # ============================================================================
+# Dependencies
+# ============================================================================
+- name: "[devops-tools] Ensure unzip is installed for AWS CLI"
+  become: true
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+    update_cache: no
+  when: awscli_enabled | bool
+
+# ============================================================================
 # AWS CLI , v2
 # ============================================================================
 - name: "[devops-tools] Check if AWS cli v2 is already installed"

@@ -53,6 +53,12 @@ all:
               applications_install_productivity: true
               # All apps enabled by default
 
+            test-devops:
+              ansible_host: test-devops
+              lxd_image: images:debian/13
+              install_devops_tools: true
+              devops_install_containers: false  # Docker not supported in LXD
+
         test_servers:
           hosts:
             test-server-ubuntu:
