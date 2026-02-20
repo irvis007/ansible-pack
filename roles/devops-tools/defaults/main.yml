@@ -11,7 +11,7 @@ asdf_enabled: true
 direnv_enabled: true
 
 # asdf config
-asdf_version: "v0.18.0"
+asdf_version: "0.18.0"
 asdf_install_dir: "{{ ansible_env.HOME }}/.asdf"
 asdf_plugins: []
 
@@ -44,9 +44,9 @@ dive_enabled: true
 # IaC tools
 # ============================================================================
 devops_install_iac_tools: true
-terraform_version: "latest"
-terragrunt_version: "latest"
-ansiblle_version: "latest"
+terraform_version: "1.8.5"
+terragrunt_version: "0.57.1"
+ansible_version: "latest"
 
 # Flags for individual tools
 terraform_enabled: true

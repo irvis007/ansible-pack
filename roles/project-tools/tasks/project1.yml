@@ -1,0 +1,163 @@
+---
+# Project 1 Tools Installation
+
+# ============================================================================
+# Make 
+# ============================================================================
+- name: "[project-tools] Install make"
+  become: true
+  ansible.builtin.apt:
+    name: make
+    state: present
+    update_cache: no
+  when: project1_make_enabled | bool
+
+# ============================================================================
+# Pre-commit 
+# ============================================================================
+- name: "[project-tools] Install pre-commit"
+  become: true
+  ansible.builtin.package:
+    name: pre-commit
+    state: present
+  when: project1_precommit_enabled | bool
+
+# ============================================================================
+# GlobalProtect VPN Client (gpclient)
+# ============================================================================
+- name: "[project-tools] Check if gpclient is installed"
+  ansible.builtin.command: gpclient --version
+  register: gpclient_check
+  failed_when: false
+  changed_when: false
+  when: project1_gpclient_enabled | bool
+
+- name: "[project-tools] Get gpclient release info"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases/tags/v{{ project1_gpclient_version }}"
+    return_content: true
+  register: gpclient_release
+  when:
+    - project1_gpclient_enabled | bool
+    - gpclient_check.rc != 0
+
+- name: "[project-tools] Download gpclient deb package"
+  ansible.builtin.get_url:
+    url: "{{ gpclient_release.json.assets | selectattr('name', 'match', '.*amd64\\.deb$') | map(attribute='browser_download_url') | first }}"
+    dest: "/tmp/gpclient.deb"
+    mode: '0644'
+  when:
+    - project1_gpclient_enabled | bool
+    - gpclient_check.rc != 0
+
+- name: "[project-tools] Install gpclient"
+  become: true
+  ansible.builtin.apt:
+    deb: "/tmp/gpclient.deb"
+    state: present
+  when:
+    - project1_gpclient_enabled | bool
+    - gpclient_check.rc != 0
+
+- name: "[project-tools] Cleanup gpclient deb package"
+  ansible.builtin.file:
+    path: "/tmp/gpclient.deb"
+    state: absent
+  when:
+    - project1_gpclient_enabled | bool
+    - gpclient_check.rc != 0
+
+# ============================================================================
+# devx 
+# ============================================================================
+- name: "[project-tools] Check if devx is installed"
+  ansible.builtin.command: devx --version
+  register: devx_check
+  failed_when: false
+  changed_when: false
+  when: project1_devx_enabled | bool
+
+- name: "[project-tools] Get latest devx version"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/{{ project1_devx_github_repo }}/releases/latest"
+    return_content: true
+  register: devx_latest
+  when:
+    - project1_devx_enabled | bool
+    - devx_check.rc != 0
+
+- name: "[project-tools] Download devx binary"
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ devx_latest.json.assets | selectattr('name', 'match', '.*linux.*amd64.*') | map(attribute='browser_download_url') | first }}"
+    dest: "/usr/local/bin/devx"
+    mode: '0755'
+  when:
+    - project1_devx_enabled | bool
+    - devx_check.rc != 0
+
+# ============================================================================
+# gohip 
+# ============================================================================
+- name: "[project-tools] Check if gohip is installed"
+  ansible.builtin.command: gohip --version
+  register: gohip_check
+  failed_when: false
+  changed_when: false
+  when: project1_gohip_enabled | bool
+
+- name: "[project-tools] Download gohip deb package"
+  ansible.builtin.get_url:
+    url: "https://github.com/bechampion/gohip/releases/download/v{{ project1_gohip_version }}/gohip-{{ project1_gohip_version }}-x86_64.deb"
+    dest: "/tmp/gohip-{{ project1_gohip_version }}.deb"
+    mode: '0644'
+  when:
+    - project1_gohip_enabled | bool
+    - gohip_check.rc != 0
+
+- name: "[project-tools] Install gohip"
+  become: true
+  ansible.builtin.apt:
+    deb: "/tmp/gohip-{{ project1_gohip_version }}.deb"
+    state: present
+  when:
+    - project1_gohip_enabled | bool
+    - gohip_check.rc != 0
+
+- name: "[project-tools] Cleanup gohip deb package"
+  ansible.builtin.file:
+    path: "/tmp/gohip-{{ project1_gohip_version }}.deb"
+    state: absent
+  when:
+    - project1_gohip_enabled | bool
+    - gohip_check.rc != 0
+
+# ============================================================================
+# ClamAV 
+# ============================================================================
+- name: "[project-tools] Install ClamAV packages"
+  become: true
+  ansible.builtin.package:
+    name:
+      - clamav
+      - clamav-daemon
+      - clamav-base
+      - clamav-freshclam
+      - libclamav12
+    state: present
+  when: project1_clamav_enabled | bool
+
+# ============================================================================
+# Small Utilities 
+# ============================================================================
+- name: "[project-tools] Install small utilities"
+  become: true
+  ansible.builtin.package:
+    name:
+      - curl
+      - lsb-release
+      - gpg
+      - unzip
+      - amazon-ecr-credential-helper
+    state: present
+  when: project1_utilities_enabled | bool

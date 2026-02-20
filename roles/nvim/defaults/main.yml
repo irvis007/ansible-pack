@@ -126,7 +126,7 @@ nvim_python_packages:
 # Additional Optional Tools
 # ============================================================================
 # Terminal emulator (for better terminal experience)
-nvim_install_terminator: false  # Most users have their own preferred terminal
+nvim_install_terminator: true  # Most users have their own preferred terminal
 
 # ============================================================================
 # Initialization

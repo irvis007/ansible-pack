@@ -44,6 +44,10 @@
       tags: ["applications", "desktop-apps", "gui"]
       when: install_applications | default(true)
 
+    - role: project-tools
+      tags: ["project-tools", "projects"]
+      when: install_project_tools | default(true)
+
     - role: nvim
       tags: ["nvim", "editor", "astronvim"]
       when: install_astronvim | default(true)

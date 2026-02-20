@@ -1,0 +1,33 @@
+---
+# Project Tools Role Defaults
+# Project-specific tools and dependencies
+
+# ============================================================================
+# Project 1 - First Project
+# ============================================================================
+project1_enabled: true
+
+# Tool versions
+project1_gpclient_version: "2.4.7"
+
+# devx configuration
+project1_devx_github_repo: "owner/devx"  # Update with actual repo: e.g., "company/devx"
+project1_devx_version: "latest"
+
+# Individual tool toggles
+project1_devx_enabled: false
+project1_make_enabled: true
+project1_gpclient_enabled: true
+project1_precommit_enabled: true
+project1_gohip_enabled: true
+project1_clamav_enabled: true
+project1_utilities_enabled: true
+
+# Tool versions
+project1_gohip_version: "0.3.10"
+
+# ============================================================================
+# Future Projects
+# ============================================================================
+# Add more projects here as needed
+# project2_enabled: false
