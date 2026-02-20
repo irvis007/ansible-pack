@@ -15,22 +15,11 @@
 # ============================================================================
 # Pre-commit - Git hooks framework
 # ============================================================================
-- name: "[project-tools] Ensure pip is installed for pre-commit"
+- name: "[project-tools] Install pre-commit"
   become: true
-  ansible.builtin.apt:
-    name:
-      - python3-pip
-      - python3-venv
-    state: present
-    update_cache: no
-  when: project1_precommit_enabled | bool
-
-- name: "[project-tools] Install pre-commit via pip"
-  become: true
-  ansible.builtin.pip:
+  ansible.builtin.package:
     name: pre-commit
     state: present
-    executable: pip3
   when: project1_precommit_enabled | bool
 
 # ============================================================================
@@ -43,22 +32,19 @@
   changed_when: false
   when: project1_gpclient_enabled | bool
 
-- name: "[project-tools] Install gpclient dependencies"
-  become: true
-  ansible.builtin.apt:
-    name:
-      - wget
-      - ca-certificates
-    state: present
-    update_cache: no
+- name: "[project-tools] Get gpclient release info"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases/tags/v{{ project1_gpclient_version }}"
+    return_content: true
+  register: gpclient_release
   when:
     - project1_gpclient_enabled | bool
     - gpclient_check.rc != 0
 
 - name: "[project-tools] Download gpclient deb package"
   ansible.builtin.get_url:
-    url: "https://github.com/yuezk/GlobalProtect-openconnect/releases/download/v{{ project1_gpclient_version }}/globalprotect-openconnect_{{ project1_gpclient_version }}_amd64.deb"
-    dest: "/tmp/gpclient-{{ project1_gpclient_version }}.deb"
+    url: "{{ gpclient_release.json.assets | selectattr('name', 'match', '.*amd64\\.deb$') | map(attribute='browser_download_url') | first }}"
+    dest: "/tmp/gpclient.deb"
     mode: '0644'
   when:
     - project1_gpclient_enabled | bool
@@ -67,7 +53,7 @@
 - name: "[project-tools] Install gpclient"
   become: true
   ansible.builtin.apt:
-    deb: "/tmp/gpclient-{{ project1_gpclient_version }}.deb"
+    deb: "/tmp/gpclient.deb"
     state: present
   when:
     - project1_gpclient_enabled | bool
@@ -75,7 +61,7 @@
 
 - name: "[project-tools] Cleanup gpclient deb package"
   ansible.builtin.file:
-    path: "/tmp/gpclient-{{ project1_gpclient_version }}.deb"
+    path: "/tmp/gpclient.deb"
     state: absent
   when:
     - project1_gpclient_enabled | bool
@@ -156,9 +142,8 @@
       - clamav
       - clamav-daemon
       - clamav-base
-      - clamav-data
       - clamav-freshclam
-      - libclamav11t64
+      - libclamav12
     state: present
   when: project1_clamav_enabled | bool
 

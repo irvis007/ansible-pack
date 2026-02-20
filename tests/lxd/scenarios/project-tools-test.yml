@@ -1,0 +1,64 @@
+---
+# Test playbook for project-tools role
+# Tests: make, pre-commit, gpclient, devx, gohip, clamav, utilities
+
+- name: Test Project Tools Role
+  hosts: test-project-tools
+  gather_facts: true
+
+  vars:
+    # Enable role
+    install_project_tools: true
+    project1_enabled: true
+
+    # Enable all tools
+    project1_make_enabled: true
+    project1_precommit_enabled: true
+    project1_gpclient_enabled: true
+    project1_devx_enabled: false  # Skip devx (needs GitHub repo configured)
+    project1_gohip_enabled: true
+    project1_clamav_enabled: true
+    project1_utilities_enabled: true
+
+  roles:
+    - role: project-tools
+
+  post_tasks:
+    - name: Verify make installation
+      ansible.builtin.command: make --version
+      register: make_version
+      changed_when: false
+      when: project1_make_enabled | bool
+
+    - name: Verify pre-commit installation
+      ansible.builtin.command: pre-commit --version
+      register: precommit_version
+      changed_when: false
+      when: project1_precommit_enabled | bool
+
+    - name: Verify gpclient installation
+      ansible.builtin.command: gpclient --version
+      register: gpclient_version
+      changed_when: false
+      when: project1_gpclient_enabled | bool
+
+    - name: Verify gohip installation
+      ansible.builtin.stat:
+        path: /usr/bin/gohip
+      register: gohip_stat
+      when: project1_gohip_enabled | bool
+
+    - name: Verify ClamAV installation
+      ansible.builtin.command: clamscan --version
+      register: clamav_version
+      changed_when: false
+      when: project1_clamav_enabled | bool
+
+    - name: Display versions
+      ansible.builtin.debug:
+        msg: |
+          Make: {{ make_version.stdout_lines[0] if project1_make_enabled else 'Skipped' }}
+          Pre-commit: {{ precommit_version.stdout_lines[0] if project1_precommit_enabled else 'Skipped' }}
+          gpclient: {{ gpclient_version.stdout_lines[0] if project1_gpclient_enabled else 'Skipped' }}
+          gohip: {{ 'Installed at ' + gohip_stat.stat.path if (project1_gohip_enabled and gohip_stat.stat.exists) else 'Skipped' }}
+          ClamAV: {{ clamav_version.stdout_lines[0] if project1_clamav_enabled else 'Skipped' }}
