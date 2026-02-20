@@ -1,3 +1,10 @@
+## [1.5.9](https://github.com/irvis007/ansible-pack/compare/v1.5.8...v1.5.9) (2026-02-20)
+
+
+### Bug Fixes
+
+* **httpie:** Fix installation ([86aaea5](https://github.com/irvis007/ansible-pack/commit/86aaea57620a9baf5170cf644f54725fefbe3abe))
+
 ## [1.5.8](https://github.com/irvis007/ansible-pack/compare/v1.5.7...v1.5.8) (2026-02-19)
 
 
