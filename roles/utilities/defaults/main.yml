@@ -16,6 +16,7 @@ utilities_install_fzf: "{{ utilities_enabled | bool }}"
 utilities_install_zoxide: "{{ utilities_enabled | bool }}"
 utilities_install_tmux: "{{ utilities_enabled | bool }}"
 utilities_install_lazygit: "{{ utilities_enabled | bool }}"
+utilities_install_quicktile: "{{ utilities_enabled | bool }}"
 
 # Version pinning
 utilities_dust_version: "v1.0.0"

@@ -50,3 +50,12 @@
   include_tasks: lazygit.yml
   when: utilities_install_lazygit | bool
   tags: ['utilities', 'lazygit']
+
+# TODO: expand when: condition to include Ubuntu/Debian when needed
+# when: ansible_distribution in ['MXLinux', 'Ubuntu', 'Debian']
+- name: Setup QuickTile window manager helper
+  include_tasks: quicktile.yml
+  when:
+    - utilities_install_quicktile | bool
+    - ansible_distribution == "MXLinux"
+  tags: ['utilities', 'quicktile']
