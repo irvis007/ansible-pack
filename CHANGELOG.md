@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/irvis007/ansible-pack/compare/v1.5.9...v1.6.0) (2026-02-27)
+
+
+### Features
+
+* **project1:** Add new role ([ef18fb0](https://github.com/irvis007/ansible-pack/commit/ef18fb0f25c0ff85794ab9ac4db40c45945fee02))
+
 ## [1.5.9](https://github.com/irvis007/ansible-pack/compare/v1.5.8...v1.5.9) (2026-02-20)
 
 
