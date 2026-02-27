@@ -16,7 +16,7 @@
 # ============================================================================
 - name: "[devops-tools] Check if TF plugin is available in asdf vm"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin list | grep -q terraform
   args:
     executable: /bin/bash
@@ -29,7 +29,7 @@
 
 - name: "[devops-tools] Add Terraform plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin add terraform
   args:
     executable: /bin/bash
@@ -40,7 +40,7 @@
 
 - name: "[devops-tools] Install Terraform plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf install terraform {{ terraform_version }}
   args:
     executable: /bin/bash
@@ -49,10 +49,10 @@
     - asdf_enabled | bool
     - terraform_plugin_check.rc != 0
 
-- name: "[devops-tools] Set global version for Terraform plugin with asdf"
+- name: "[devops-tools] Set user-level version for Terraform plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
-    asdf global terraform {{ terraform_version }}
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+    asdf set --home terraform {{ terraform_version }}
   args:
     executable: /bin/bash
   when:
@@ -65,7 +65,7 @@
 # ============================================================================
 - name: "[devops-tools] Check if TG plugin is available in asdf vm"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin list | grep -q terragrunt
   args:
     executable: /bin/bash
@@ -78,7 +78,7 @@
 
 - name: "[devops-tools] Add Terragrunt plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin add terragrunt
   args:
     executable: /bin/bash
@@ -89,7 +89,7 @@
 
 - name: "[devops-tools] Install Terragrunt plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf install terragrunt {{ terragrunt_version }}
   args:
     executable: /bin/bash
@@ -98,10 +98,10 @@
     - asdf_enabled | bool
     - terragrunt_plugin_check.rc != 0
 
-- name: "[devops-tools] Set global version for Terragrunt plugin with asdf"
+- name: "[devops-tools] Set user-level version for Terragrunt plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
-    asdf global terragrunt {{ terragrunt_version }}
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+    asdf set --home terragrunt {{ terragrunt_version }}
   args:
     executable: /bin/bash
   when:
@@ -113,7 +113,7 @@
 # ============================================================================
 - name: "[devops-tools] Check if ansible plugin is available in asdf vm"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin list | grep -q ansible
   args:
     executable: /bin/bash
@@ -126,7 +126,7 @@
 
 - name: "[devops-tools] Add Ansible plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf plugin add ansible
   args:
     executable: /bin/bash
@@ -137,7 +137,7 @@
 
 - name: "[devops-tools] Install Ansible plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
     asdf install ansible {{ ansible_version }}
   args:
     executable: /bin/bash
@@ -146,10 +146,10 @@
     - asdf_enabled | bool
     - ansible_plugin_check.rc != 0
 
-- name: "[devops-tools] Set global version for Ansible plugin with asdf"
+- name: "[devops-tools] Set user-level version for Ansible plugin with asdf"
   ansible.builtin.shell: |
-    . "$HOME/.asdf/asdf.sh"
-    asdf global ansible {{ ansible_version }}
+    export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+    asdf set --home ansible {{ ansible_version }}
   args:
     executable: /bin/bash
   when:

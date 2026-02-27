@@ -38,7 +38,11 @@ install_applications: true
 # utilities_install_lazygit: false  # Example: disable lazygit
 
 # DevOps tools (optional, enable for work machines)
-install_devops_tools: false
+install_devops_tools: true
+
+# Project-specific tools
+install_project_tools: true
+project1_enabled: true
 
 # Granular devops-tools control (optional - uncomment to override)
 # By default, all tool categories are installed when install_devops_tools: true

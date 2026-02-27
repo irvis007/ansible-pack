@@ -16,21 +16,51 @@
 # ============================================================================
 # asdf - Universal version manager
 # ============================================================================
-- name: "[devops-tools] Check if asdf is already installed"
+- name: "[devops-tools] Check if asdf binary exists"
   ansible.builtin.stat:
-    path: "{{ asdf_install_dir }}"
-  register: asdf_dir
+    path: "{{ asdf_install_dir }}/asdf"
+  register: asdf_binary
   when: asdf_enabled | bool
 
-- name: "[devops-tools] Clone asdf repo"
-  ansible.builtin.git:
-    repo: "https://github.com/asdf-vm/asdf.git"
-    dest: "{{ asdf_install_dir }}"
-    version: "{{ asdf_version }}"
-    depth: 1
+- name: "[devops-tools] Detect system architecture"
+  ansible.builtin.set_fact:
+    asdf_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else ('arm64' if ansible_architecture == 'aarch64' else '386') }}"
+  when: asdf_enabled | bool
+
+- name: "[devops-tools] Create asdf directory"
+  ansible.builtin.file:
+    path: "{{ asdf_install_dir }}"
+    state: directory
+    mode: '0755'
   when:
     - asdf_enabled | bool
-    - not asdf_dir.stat.exists
+    - not asdf_binary.stat.exists
+
+- name: "[devops-tools] Download asdf binary release"
+  ansible.builtin.get_url:
+    url: "https://github.com/asdf-vm/asdf/releases/download/v{{ asdf_version }}/asdf-v{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
+    dest: "/tmp/asdf-v{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
+    mode: '0644'
+  when:
+    - asdf_enabled | bool
+    - not asdf_binary.stat.exists
+
+- name: "[devops-tools] Extract asdf binary"
+  ansible.builtin.unarchive:
+    src: "/tmp/asdf-v{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
+    dest: "{{ asdf_install_dir }}"
+    remote_src: yes
+  when:
+    - asdf_enabled | bool
+    - not asdf_binary.stat.exists
+
+- name: "[devops-tools] Clean up downloaded tarball"
+  ansible.builtin.file:
+    path: "/tmp/asdf-v{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
+    state: absent
+  when:
+    - asdf_enabled | bool
+    - not asdf_binary.stat.exists
 
 - name: "[devops-tools] Add asdf to bash config"
   ansible.builtin.blockinfile:
@@ -38,11 +68,9 @@
     create: yes
     marker: "# {mark} ANSIBLE MANAGED BLOCK - asdf"
     block: |
-      . "$HOME/.asdf/asdf.sh"
-      . "$HOME/.asdf/completions/asdf.bash"
-  when:
-    - asdf_enabled | bool
-    - not asdf_dir.stat.exists
+      export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+      . <(asdf completion bash)
+  when: asdf_enabled | bool
 
 - name: "[devops-tools] Add asdf to zsh config"
   ansible.builtin.blockinfile:
@@ -50,11 +78,10 @@
     create: yes
     marker: "# {mark} ANSIBLE MANAGED BLOCK - asdf"
     block: |
-      . "$HOME/.asdf/asdf.sh"
-      . "$HOME/.asdf/completions/asdf.zsh"
-  when:
-    - asdf_enabled | bool
-    - not asdf_dir.stat.exists
+      export PATH="{{ asdf_install_dir }}:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+      . <(asdf completion zsh)
+      compinit
+  when: asdf_enabled | bool
 
 - name: "[devops-tools] Install direnv"
   become: true

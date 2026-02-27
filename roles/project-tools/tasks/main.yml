@@ -1,0 +1,11 @@
+---
+# Project Tools Role - Main Orchestrator
+# Installs project-specific tools and dependencies
+
+# ============================================================================
+# Project 1
+# ============================================================================
+- name: "[project-tools] Install Project 1 tools"
+  include_tasks: project1.yml
+  when: project1_enabled | bool
+  tags: ["project-tools", "project1"]

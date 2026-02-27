@@ -1,0 +1,6 @@
+---
+all:
+  hosts:
+    test-project-tools:
+      ansible_connection: lxd
+      ansible_user: root
