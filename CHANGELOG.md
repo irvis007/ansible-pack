@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/irvis007/ansible-pack/compare/v1.7.0...v1.7.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* **nvim:** initialize tflint plugins to prevent LSP errors with Terraform files ([241ffe8](https://github.com/irvis007/ansible-pack/commit/241ffe88d86fb9c07a4f31b0185e01b25f5ca5d5))
+
 # [1.7.0](https://github.com/irvis007/ansible-pack/compare/v1.6.0...v1.7.0) (2026-03-30)
 
 
