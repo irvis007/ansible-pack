@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/irvis007/ansible-pack/compare/v1.6.0...v1.7.0) (2026-03-30)
+
+
+### Features
+
+* **QuickTile:** Add new tool for utilites ([1f32e0f](https://github.com/irvis007/ansible-pack/commit/1f32e0f9ddbe8974fe783449c70b06ff3f932001))
+
 # [1.6.0](https://github.com/irvis007/ansible-pack/compare/v1.5.9...v1.6.0) (2026-02-27)
 
 
