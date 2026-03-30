@@ -131,7 +131,12 @@ nodejs_npm_global_packages: [] # Additional npm packages
 ```yaml
 nvim_run_initialization: true
 nvim_init_command: "nvim --headless -c 'quitall'"
+
+# Initialize tflint after installation (fixes "Plugin 'aws' not found" errors)
+nvim_initialize_tflint: true # Default: true
 ```
+
+The `nvim_initialize_tflint` option runs `tflint --init` after AstroNvim installation to install required tflint plugins (like the AWS ruleset). This prevents LSP errors when opening Terraform files.
 
 ## Example Configurations
 
