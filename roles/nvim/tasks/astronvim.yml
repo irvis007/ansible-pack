@@ -64,6 +64,25 @@
   async: 300
   poll: 10
 
+# ============================================================================
+# LSP Tool Initialization
+# ============================================================================
+- name: "[AstroNvim] Check if tflint is installed via Mason"
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/share/nvim/mason/bin/tflint"
+  register: tflint_binary
+  when: nvim_initialize_tflint | bool
+
+- name: "[AstroNvim] Initialize tflint (install required plugins)"
+  ansible.builtin.shell: "{{ ansible_env.HOME }}/.local/share/nvim/mason/bin/tflint --init"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  when:
+    - nvim_initialize_tflint | bool
+    - tflint_binary.stat.exists
+  changed_when: false
+  failed_when: false
+
 - name: "[AstroNvim] Display installation complete message"
   ansible.builtin.debug:
     msg:

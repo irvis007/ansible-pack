@@ -137,6 +137,10 @@ nvim_run_initialization: true
 # Initialization command (installs plugins, Mason packages, etc.)
 nvim_init_command: "nvim --headless -c 'quitall'"
 
+# Initialize tflint after AstroNvim installation (installs required plugins like aws)
+# This fixes "Plugin 'aws' not found" errors when opening Terraform files
+nvim_initialize_tflint: true
+
 # ============================================================================
 # Backward Compatibility
 # ============================================================================
