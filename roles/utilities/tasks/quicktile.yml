@@ -1,0 +1,117 @@
+---
+# Install and configure QuickTile window tiling daemon for XFCE
+# QuickTile: Python-based X11 window management for monitor switching
+
+# ============================================================================
+# Install system dependencies
+# ============================================================================
+- name: Install QuickTile apt dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3-gi
+      - python3-xlib
+      - python3-dbus
+      - gir1.2-wnck-3.0
+      - gir1.2-gdk-3.0
+    state: present
+    update_cache: false
+
+# ============================================================================
+# Install QuickTile from GitHub
+# ============================================================================
+- name: Install QuickTile via pip from GitHub
+  become: true
+  ansible.builtin.pip:
+    name: "https://github.com/ssokolow/quicktile/archive/master.zip"
+    executable: pip3
+    extra_args: "--break-system-packages"
+    state: present
+
+# ============================================================================
+# Generate default configuration
+# ============================================================================
+- name: Generate default QuickTile config (run once)
+  become: false
+  ansible.builtin.command:
+    cmd: quicktile
+    creates: "{{ ansible_env.HOME }}/.config/quicktile.cfg"
+  # QuickTile exits immediately when run without --daemonize (expected behavior)
+
+# ============================================================================
+# Configure XFCE autostart
+# ============================================================================
+- name: Ensure autostart directory exists
+  become: false
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+    mode: '0755'
+
+- name: Deploy QuickTile XFCE autostart entry
+  become: false
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/autostart/quicktile.desktop"
+    mode: '0644'
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    force: false
+    content: |
+      [Desktop Entry]
+      Version=1.0
+      Type=Application
+      Name=QuickTile
+      Comment=Window tiling keybinding daemon
+      Exec=quicktile --daemonize
+      Icon=
+      Terminal=false
+      StartupNotify=false
+      X-XFCE-Autostart-Override=true
+
+# ============================================================================
+# Configure XFCE keyboard shortcuts
+# ============================================================================
+- name: Check if XFCE keyboard shortcuts file exists
+  become: false
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
+  register: xfce_shortcuts_file
+
+- name: Add QuickTile keybindings to XFCE shortcuts
+  become: false
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
+    marker: "    <!-- {mark} ANSIBLE MANAGED: QuickTile keybindings -->"
+    insertbefore: "</channel>"
+    backup: yes
+    block: |
+      <property name="custom" type="empty">
+        <property name="&lt;Super&gt;&lt;Shift&gt;Right" type="string" value="quicktile monitor-next"/>
+        <property name="&lt;Super&gt;&lt;Shift&gt;Left" type="string" value="quicktile monitor-prev"/>
+      </property>
+  when: xfce_shortcuts_file.stat.exists
+
+- name: Notify if XFCE shortcuts file does not exist
+  become: false
+  ansible.builtin.debug:
+    msg: |
+      XFCE keyboard shortcuts file not found. This is normal for a fresh installation.
+      Please log into XFCE at least once, then re-run this playbook to configure keybindings.
+  when: not xfce_shortcuts_file.stat.exists
+
+# ============================================================================
+# Verification instructions
+# ============================================================================
+# To verify after running:
+#   quicktile --show-actions | grep monitor        → should list monitor-next, monitor-prev
+#   cat ~/.config/autostart/quicktile.desktop      → should exist
+#   cat ~/.config/quicktile.cfg                    → should exist
+#   xfconf-query -c xfce4-keyboard-shortcuts -lv \
+#     | grep -i super                              → should show Super+Shift+Right/Left entries
+#   ls ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml.*
+#                                                  → backup file should exist
+#
+# NOTE: keybinding changes require logout/login to take effect.
+# Test after re-login:
+#   Super+Shift+Right  → active window moves to next monitor
+#   Super+Shift+Left   → active window moves to previous monitor
