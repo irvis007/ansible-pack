@@ -134,8 +134,8 @@ nvim_install_terminator: true  # Most users have their own preferred terminal
 # Run headless nvim to initialize plugins after installation
 nvim_run_initialization: true
 
-# Initialization command (installs plugins, Mason packages, etc.)
-nvim_init_command: "nvim --headless -c 'quitall'"
+# Initialization command (installs/syncs plugins via lazy.nvim)
+nvim_init_command: "nvim --headless '+Lazy! sync' +qa"
 
 # Initialize tflint after AstroNvim installation (installs required plugins like aws)
 # This fixes "Plugin 'aws' not found" errors when opening Terraform files

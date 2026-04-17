@@ -102,7 +102,7 @@
 - name: "[applications] Download Pomotroid AppImage"
   become: true
   ansible.builtin.get_url:
-    url: "{{ pomotroid_latest.json.assets | selectattr('name', 'match', '.*linux.*\\.AppImage$') | map(attribute='browser_download_url') | first }}"
+    url: "{{ pomotroid_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | map(attribute='browser_download_url') | first }}"
     dest: "{{ appimage_install_dir }}/Pomotroid.AppImage"
     mode: '0755'
   when:
