@@ -1,3 +1,13 @@
+## [1.7.2](https://github.com/irvis007/ansible-pack/compare/v1.7.1...v1.7.2) (2026-04-17)
+
+
+### Bug Fixes
+
+* **config:** Roles and collections path ([fcb35fc](https://github.com/irvis007/ansible-pack/commit/fcb35fc788428640b5cef1533abb6a304135f72a))
+* **eza:** Fix eza insatallation step ([dda8cfb](https://github.com/irvis007/ansible-pack/commit/dda8cfb1348fcaf0d69d203902f7129f8f9fdfc2))
+* **nvim:** Fix lazygit init ([adbf53e](https://github.com/irvis007/ansible-pack/commit/adbf53e21be6065adaf176c2bc57f9395614c0ad))
+* **zsh:** Fix duplicated config ([af8dbfd](https://github.com/irvis007/ansible-pack/commit/af8dbfd8c45348431bebbd46fb45580a6185d88f))
+
 ## [1.7.1](https://github.com/irvis007/ansible-pack/compare/v1.7.0...v1.7.1) (2026-03-30)
 
 
