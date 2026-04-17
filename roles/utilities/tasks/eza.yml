@@ -10,24 +10,28 @@
       - wget
   when: ansible_os_family == 'Debian'
 
-- name: Check if eza is already installed (Debian)
-  ansible.builtin.shell: eza --version
-  register: eza_rc
-  failed_when: false
-  changed_when: false
+- name: Download eza GPG key (Debian)
+  become: true
+  ansible.builtin.shell: >
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+  args:
+    creates: /etc/apt/keyrings/gierens.gpg
+  when: ansible_os_family == 'Debian'
+
+- name: Set permissions on eza GPG key (Debian)
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/gierens.gpg
+    mode: '0644'
   when: ansible_os_family == 'Debian'
 
 - name: Add eza repository (Debian)
   become: true
-  ansible.builtin.shell: |
-    mkdir -p /etc/apt/keyrings
-    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | tee /etc/apt/sources.list.d/gierens.list
-    chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-    apt update
-  when: ansible_os_family == 'Debian' and eza_rc.rc != 0
-  args:
-    creates: /etc/apt/sources.list.d/gierens.list
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main"
+    filename: gierens
+    state: present
+  when: ansible_os_family == 'Debian'
 
 - name: Install eza
   become: true
