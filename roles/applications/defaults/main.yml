@@ -7,9 +7,6 @@
 # ============================================================================
 applications_install_browsers: true
 
-# Floorp
-floorp_enabled: true
-
 # Brave - Privacy-focused browser
 brave_enabled: true
 

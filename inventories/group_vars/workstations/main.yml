@@ -16,7 +16,6 @@ install_applications: true
 # applications_install_communication: true
 # applications_install_productivity: true
 # Per-application toggles:
-# floorp_enabled: true
 # brave_enabled: true
 # teams_enabled: true
 # slack_enabled: true
@@ -47,7 +46,7 @@ project1_enabled: true
 # Granular devops-tools control (optional - uncomment to override)
 # By default, all tool categories are installed when install_devops_tools: true
 # Uncomment individual flags to selectively disable/enable specific categories:
-# devops_install_version_managers: true  # asdf, direnv
+devops_install_version_managers: true  # asdf, direnv
 # devops_install_cloud_tools: true       # aws-cli
 # devops_install_containers: true        # docker, docker-compose, ctop, dive
 # devops_install_iac_tools: true         # terraform, terragrunt, ansible

@@ -2,55 +2,6 @@
 # Install web browsers (no snap!)
 
 # ============================================================================
-# Floorp - Firefox-based privacy browser
-# ============================================================================
-- name: "[applications] Ensure gnupg is installed"
-  become: true
-  ansible.builtin.apt:
-    name: gnupg
-    state: present
-    update_cache: no
-  when: floorp_enabled | bool
-
-- name: "[applications] Download Floorp GPG key"
-  become: true
-  ansible.builtin.get_url:
-    url: https://ppa.floorp.app/KEY.gpg
-    dest: /tmp/floorp-key.gpg
-    mode: '0644'
-  when: floorp_enabled | bool
-
-- name: "[applications] Dearmor and install Floorp GPG key"
-  become: true
-  ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/Floorp.gpg /tmp/floorp-key.gpg
-    creates: /usr/share/keyrings/Floorp.gpg
-  when: floorp_enabled | bool
-
-- name: "[applications] Cleanup temporary Floorp GPG key"
-  become: true
-  ansible.builtin.file:
-    path: /tmp/floorp-key.gpg
-    state: absent
-  when: floorp_enabled | bool
-
-- name: "[applications] Download Floorp sources list"
-  become: true
-  ansible.builtin.get_url:
-    url: https://ppa.floorp.app/Floorp.list
-    dest: /etc/apt/sources.list.d/Floorp.list
-    mode: '0644'
-  when: floorp_enabled | bool
-
-- name: "[applications] Install Floorp"
-  become: true
-  ansible.builtin.apt:
-    name: floorp
-    state: present
-    update_cache: yes
-  when: floorp_enabled | bool
-
-# ============================================================================
 # Brave - Privacy-focused browser
 # ============================================================================
 - name: "[applications] Add Brave GPG key"
