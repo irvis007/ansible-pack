@@ -8,11 +8,12 @@
     dest: ~/.oh-my-zsh/custom/themes/powerlevel10k
     depth: 1
 
-- name: Copy zshrc (for p10k)
+- name: Configure zshrc for p10k
   ansible.builtin.copy:
     src: zshrc-p10k
-    dest: ~/.zshrc
-    mode: 0644
+    dest: "{{ ansible_env.HOME }}/.zshrc"
+    mode: '0644'
+    backup: yes
   when: copy_dot_files
 
 - name: Copy p10k.zsh

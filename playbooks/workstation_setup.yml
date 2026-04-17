@@ -32,6 +32,10 @@
       tags: ["fonts", "nerdfonts"]
       when: install_fonts | default(true)
 
+    - role: zsh
+      tags: ["zsh", "shell"]
+      when: install_zsh | default(true)
+
     - role: utilities
       tags: ["utilities", "cli-tools"]
       when: install_utilities | default(true)
@@ -51,10 +55,6 @@
     - role: nvim
       tags: ["nvim", "editor", "astronvim"]
       when: install_astronvim | default(true)
-
-    - role: zsh
-      tags: ["zsh", "shell"]
-      when: install_zsh | default(true)
 
   post_tasks:
     - name: Display completion message
