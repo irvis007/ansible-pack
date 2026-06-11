@@ -1,3 +1,6 @@
+# direnv: load environment before instant prompt to avoid console output warning
+(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv export zsh)"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -98,10 +101,6 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# Initialize zoxide (smarter cd)
-if command -v zoxide &> /dev/null; then
-    eval "$(zoxide init zsh)"
-fi
 
 # Aliases with eza
 alias l='eza -lah --color=always --icons --group-directories-first' # with headers
