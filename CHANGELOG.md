@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/irvis007/ansible-pack/compare/v1.7.2...v1.7.3) (2026-06-11)
+
+
+### Bug Fixes
+
+* **version-managers:** Update ansible for MXLinux ([f56eae7](https://github.com/irvis007/ansible-pack/commit/f56eae7daf38ff5d36701c7dd5d660e9b6309511))
+
 ## [1.7.2](https://github.com/irvis007/ansible-pack/compare/v1.7.1...v1.7.2) (2026-04-17)
 
 
