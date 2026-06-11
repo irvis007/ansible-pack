@@ -97,9 +97,16 @@
     line: 'eval "$(direnv hook bash)"'
   when: direnv_enabled | bool
 
-- name: "[devops-tools] Add direnv hook to zsh"
+- name: "[devops-tools] Remove legacy direnv hook from zsh"
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    line: 'eval "$(direnv hook zsh)"'
+    state: absent
+  when: direnv_enabled | bool
+
+- name: "[devops-tools] Add direnv hook to zsh (p10k-compatible)"
   ansible.builtin.lineinfile:
     create: yes
     path: "{{ ansible_env.HOME }}/.zshrc"
-    line: 'eval "$(direnv hook zsh)"'
+    line: '(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"'
   when: direnv_enabled | bool

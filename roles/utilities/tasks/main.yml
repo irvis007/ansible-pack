@@ -51,11 +51,15 @@
   when: utilities_install_lazygit | bool
   tags: ['utilities', 'lazygit']
 
-# TODO: expand when: condition to include Ubuntu/Debian when needed
-# when: ansible_distribution in ['MXLinux', 'Ubuntu', 'Debian']
+- name: Check for MX Linux
+  stat:
+    path: /etc/mx-version
+  register: mx_version
+  tags: ['utilities', 'quicktile']
+
 - name: Setup QuickTile window manager helper
   include_tasks: quicktile.yml
   when:
     - utilities_install_quicktile | bool
-    - ansible_distribution == "MXLinux"
+    - mx_version.stat.exists
   tags: ['utilities', 'quicktile']
