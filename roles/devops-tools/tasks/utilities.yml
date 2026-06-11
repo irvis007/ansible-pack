@@ -40,3 +40,22 @@
     state: present
     update_cache: no
   when: httpie_enabled | bool
+
+# Claude Code - Anthropic's agentic CLI (native installer, per-user, no Node.js)
+- name: "[devops-tools] Check if Claude Code is installed"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/claude --version"
+  register: claude_code_check
+  failed_when: false
+  changed_when: false
+  when: claude_code_enabled | bool
+
+- name: "[devops-tools] Install Claude Code CLI via native installer"
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    executable: /bin/bash
+    creates: "{{ ansible_env.HOME }}/.local/bin/claude"
+  when:
+    - claude_code_enabled | bool
+    - claude_code_check.rc != 0
