@@ -73,3 +73,4 @@ mc_enabled: true
 p7zip_enabled: true
 yq_enabled: true
 httpie_enabled: true
+claude_code_enabled: true
