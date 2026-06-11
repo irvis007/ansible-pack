@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/irvis007/ansible-pack/compare/v1.7.3...v1.8.0) (2026-06-11)
+
+
+### Features
+
+* **devops-tools:** Add new tool ([76a6874](https://github.com/irvis007/ansible-pack/commit/76a6874101a15adcf0c7f02363dfb165d67ff42e))
+
 ## [1.7.3](https://github.com/irvis007/ansible-pack/compare/v1.7.2...v1.7.3) (2026-06-11)
 
 
