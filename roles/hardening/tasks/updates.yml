@@ -1,6 +1,4 @@
 ---
-# unatendetupdates
-
 - name: install unattended upgrades
   ansible.builtin.include_role:
     name: hifis.toolkit.unattended_upgrades

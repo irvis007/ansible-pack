@@ -1,9 +1,6 @@
 ---
 # Project 1 Tools Installation
 
-# ============================================================================
-# Make 
-# ============================================================================
 - name: "[project-tools] Install make"
   become: true
   ansible.builtin.apt:
@@ -12,9 +9,6 @@
     update_cache: no
   when: project1_make_enabled | bool
 
-# ============================================================================
-# Pre-commit 
-# ============================================================================
 - name: "[project-tools] Install pre-commit"
   become: true
   ansible.builtin.package:
@@ -132,9 +126,6 @@
     - project1_gohip_enabled | bool
     - gohip_check.rc != 0
 
-# ============================================================================
-# ClamAV 
-# ============================================================================
 - name: "[project-tools] Install ClamAV packages"
   become: true
   ansible.builtin.package:
@@ -147,9 +138,6 @@
     state: present
   when: project1_clamav_enabled | bool
 
-# ============================================================================
-# Small Utilities 
-# ============================================================================
 - name: "[project-tools] Install small utilities"
   become: true
   ansible.builtin.package:
