@@ -40,7 +40,6 @@
     backup: yes
     force: true
 
-# copy config files,
 - name: copy suricata.yaml config files
   template:
     src: suricata.yaml.j2

@@ -1,4 +1,3 @@
-# tasks file for p10k
 - name: include vars
   include_vars: vars.yml
 
