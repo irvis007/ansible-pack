@@ -59,3 +59,12 @@
   when:
     - claude_code_enabled | bool
     - claude_code_check.rc != 0
+
+- name: "[devops-tools] Make Claude Code globally available on PATH"
+  become: true
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.local/bin/claude"
+    dest: /usr/local/bin/claude
+    state: link
+    force: true
+  when: claude_code_enabled | bool
