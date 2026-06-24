@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/irvis007/ansible-pack/compare/v1.8.0...v1.8.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* **quicktile:** Fix missing pip3 error ([eba278c](https://github.com/irvis007/ansible-pack/commit/eba278c45b959c7f7c98b7faa4eb9387110ea43b))
+
 # [1.8.0](https://github.com/irvis007/ansible-pack/compare/v1.7.3...v1.8.0) (2026-06-11)
 
 
