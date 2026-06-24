@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/irvis007/ansible-pack/compare/v1.8.1...v1.8.2) (2026-06-24)
+
+
+### Bug Fixes
+
+* **devops-tools:** Fix claude code installation ([ea05f13](https://github.com/irvis007/ansible-pack/commit/ea05f13c3effb47d7c2595a77ddaa5adfcf0e306))
+
 ## [1.8.1](https://github.com/irvis007/ansible-pack/compare/v1.8.0...v1.8.1) (2026-06-24)
 
 
