@@ -9,13 +9,14 @@
   become: true
   ansible.builtin.apt:
     name:
+      - python3-pip
       - python3-gi
       - python3-xlib
       - python3-dbus
       - gir1.2-wnck-3.0
       - gir1.2-gdk-3.0
     state: present
-    update_cache: false
+    update_cache: true
 
 # ============================================================================
 # Install QuickTile from GitHub
