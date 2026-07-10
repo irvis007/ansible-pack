@@ -1,0 +1,30 @@
+---
+# Locale Role - Orchestrator
+# Configures the default system language and prunes spell-check dictionaries
+# down to English + Polish only.
+
+- name: Configure default system language
+  ansible.builtin.include_tasks:
+    file: language.yml
+    apply:
+      tags: ['locale', 'language']
+  when: locale_enabled | bool
+  tags: ['locale', 'language']
+
+- name: Align per-user desktop session language
+  ansible.builtin.include_tasks:
+    file: session.yml
+    apply:
+      tags: ['locale', 'language', 'session']
+  when:
+    - locale_enabled | bool
+    - locale_configure_session | bool
+  tags: ['locale', 'language', 'session']
+
+- name: Manage spell-check dictionaries
+  ansible.builtin.include_tasks:
+    file: dictionaries.yml
+    apply:
+      tags: ['locale', 'dictionaries']
+  when: locale_enabled | bool
+  tags: ['locale', 'dictionaries']

@@ -28,6 +28,10 @@
       when: ansible_user_id == 'root'
 
   roles:
+    - role: locale
+      tags: ["locale", "language"]
+      when: configure_locale | default(true)
+
     - role: fonts
       tags: ["fonts", "nerdfonts"]
       when: install_fonts | default(true)

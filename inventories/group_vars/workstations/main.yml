@@ -2,6 +2,13 @@
 # Workstations: Development machines and personal laptops
 # Characteristics: All tools installed, minimal hardening, convenience over security
 
+# System locale & spell-check dictionaries
+# Sets the default system language to English (British) and keeps only the
+# English + Polish dictionaries installed. The language itself comes from the
+# shared `system_locale` var (group_vars/all/common.yml); this only toggles
+# the role on.
+configure_locale: true
+
 # Core roles
 install_utilities: true
 install_zsh: true

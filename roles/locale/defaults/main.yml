@@ -1,0 +1,42 @@
+---
+# Locale Role Defaults
+# Sets the default system language and manages spell-check dictionaries.
+
+# Master toggle
+locale_enabled: "{{ configure_locale | default(true) }}"
+
+# Default system language (written as LANG in /etc/default/locale).
+# Falls back to the shared system_locale var from group_vars/all/common.yml.
+locale_system_lang: "{{ system_locale | default('en_GB.UTF-8') }}"
+
+# Also set the per-user desktop session language. On MX Linux / Xfce the
+# login manager (LightDM) stores a per-user language in ~/.dmrc that OVERRIDES
+# the system default at every login, so this must be aligned too.
+locale_configure_session: true
+
+# Home directory whose session language is aligned (defaults to the user
+# running the playbook).
+locale_session_home: "{{ ansible_env.HOME }}"
+
+# Locales to generate on the host. Must cover locale_system_lang and every
+# language backing the dictionaries below.
+locale_generate:
+  - en_GB.UTF-8
+  - pl_PL.UTF-8
+
+# Spell-check dictionaries to keep installed - ONLY these languages
+# (English + Polish). Any other hunspell/myspell/aspell dictionary package
+# is removed by the pruning task.
+locale_dictionaries:
+  - hunspell-en-gb
+  - hunspell-pl
+  - aspell-en
+  - aspell-pl
+
+# Regex (matched against installed package names) identifying dictionary
+# packages that are candidates for removal when not in locale_dictionaries.
+locale_dictionary_pattern: '^(hunspell|myspell|aspell)-'
+
+# Suffixes excluded from removal - these are tooling/framework packages,
+# not language dictionaries (e.g. aspell-doc, myspell-tools).
+locale_dictionary_keep_pattern: '-(doc|dev|tools|common|bin)$'

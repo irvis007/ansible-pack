@@ -1,0 +1,34 @@
+---
+# Align the per-user desktop session language with the system default.
+#
+# On MX Linux / Xfce the LightDM login manager applies a per-user language
+# from ~/.dmrc (and, when present, from AccountsService) which takes priority
+# over /etc/default/locale. Without this the session stays in the previously
+# selected language even after the system default is changed.
+
+- name: Set desktop session language in ~/.dmrc
+  community.general.ini_file:
+    path: "{{ locale_session_home }}/.dmrc"
+    section: Desktop
+    option: Language
+    value: "{{ locale_system_lang }}"
+    create: true
+    no_extra_spaces: true
+    mode: "0644"
+
+- name: Check for an AccountsService entry for this user
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/AccountsService/users/{{ ansible_user_id }}"
+  register: locale_accountsservice
+
+- name: Align AccountsService session language (if managed)
+  become: true
+  community.general.ini_file:
+    path: "/var/lib/AccountsService/users/{{ ansible_user_id }}"
+    section: User
+    option: Language
+    value: "{{ locale_system_lang }}"
+    no_extra_spaces: true
+    mode: "0600"
+  when: locale_accountsservice.stat.exists

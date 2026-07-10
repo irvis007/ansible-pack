@@ -197,6 +197,7 @@ ssh_password_authentication: no
 | **bootstrap** | Create ansible user with SSH key auth                        | `bootstrap`              |
 | **fonts**     | Install Nerd Fonts (EnvyCodeR)                               | `fonts`, `nerdfonts`     |
 | **hardening** | Security hardening (UFW, fail2ban, SSH/OS hardening)         | `hardening`, `security`  |
+| **locale**    | Default system language (en_GB) + English/Polish dictionaries only | `locale`, `language` |
 | **nvim**      | Neovim + AstroVim + dependencies                             | `nvim`, `editor`         |
 | **utilities** | Modern CLI tools (bat, eza, fd, ripgrep, dust, zoxide, tmux) | `utilities`, `cli-tools` |
 | **zsh**       | ZSH + Oh-My-Zsh + plugins + Powerlevel10k                    | `zsh`, `shell`           |

@@ -1,0 +1,43 @@
+---
+# Install the desired English + Polish dictionaries, then remove every other
+# spell-check dictionary so only these two languages remain.
+#
+# Caveat: this prunes by uninstalling. Desktop suites (e.g. LibreOffice) pull
+# in hunspell-* dictionaries as apt "Recommends", so a later apt install/upgrade
+# can reinstall a pruned dictionary; the next run then removes it again (the
+# task reports "changed" each cycle rather than converging). If that churn is a
+# problem, consider setting APT::Install-Recommends "false" for those installs,
+# or configuring the default spell-check language instead of uninstalling.
+
+- name: Install English and Polish spell-check dictionaries
+  become: true
+  ansible.builtin.package:
+    name: "{{ locale_dictionaries }}"
+    state: present
+
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Determine unwanted dictionary packages
+  ansible.builtin.set_fact:
+    locale_dicts_to_remove: >-
+      {{
+        ansible_facts.packages.keys()
+        | select('match', locale_dictionary_pattern)
+        | reject('in', locale_dictionaries)
+        | reject('search', locale_dictionary_keep_pattern)
+        | list
+      }}
+
+- name: Report dictionaries scheduled for removal
+  ansible.builtin.debug:
+    msg: "Removing non-English/Polish dictionaries: {{ locale_dicts_to_remove | join(', ') }}"
+  when: locale_dicts_to_remove | length > 0
+
+- name: Remove unwanted spell-check dictionaries
+  become: true
+  ansible.builtin.package:
+    name: "{{ locale_dicts_to_remove }}"
+    state: absent
+  when: locale_dicts_to_remove | length > 0

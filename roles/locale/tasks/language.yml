@@ -1,0 +1,20 @@
+---
+# Generate the required locales and set the default system language.
+
+- name: Ensure required locales are generated
+  become: true
+  community.general.locale_gen:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ locale_generate }}"
+
+- name: Set default system language (LANG)
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: "LANG={{ locale_system_lang }}"
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
