@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/irvis007/ansible-pack/compare/v1.8.2...v1.9.0) (2026-07-10)
+
+
+### Features
+
+* **locale:** Adds new role ([3feff8d](https://github.com/irvis007/ansible-pack/commit/3feff8d6de30f2de980a452efcf8a995fd3f0061))
+
 ## [1.8.2](https://github.com/irvis007/ansible-pack/compare/v1.8.1...v1.8.2) (2026-06-24)
 
 
