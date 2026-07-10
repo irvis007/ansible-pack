@@ -4,7 +4,7 @@ Role for installing Neovim and AstroNvim
 
 ## Features
 
-- **Latest Neovim**: Official pre-built binary from GitHub (always fresh)
+- **Pinned Neovim**: Official pre-built binary from GitHub, version-pinned for reproducibility and AstroNvim compatibility (see `nvim_version`)
 - **AstroNvim v5**: Your personal fork with config backup/restore
 - **Modular Dependencies**: Feature flags for all optional dependencies
 - **Backup Support**: Automatic backup of existing config
@@ -108,6 +108,23 @@ nvim_backup_existing: false
 ```
 
 ## Configuration Variables
+
+### Neovim Version
+
+```yaml
+nvim_version: "v0.11.7" # Pinned neovim/neovim release tag
+```
+
+Neovim is pinned rather than tracking `latest`. Neovim 0.12.x changed the
+tree-sitter query-match API, which breaks the AstroNvim v5 config deployed by
+this role (it pins nvim-treesitter to the archived `master` branch). On 0.12.x,
+opening any file fails with `attempt to call method 'range' (a nil value)`.
+0.11.x is the newest compatible line.
+
+The install is version-aware: if a machine already has a different (e.g.
+incompatible) Neovim, re-running the role reinstalls the pinned version. Revisit
+this pin once AstroNvim upstream adopts the nvim-treesitter `main` branch (see
+[ROADMAP.md](../../ROADMAP.md)).
 
 ### Repository Settings
 

@@ -58,8 +58,19 @@ nodejs_npm_global_packages: []
 # ============================================================================
 # Neovim Installation
 # ============================================================================
-# Install Neovim via official pre-built binary (latest stable from GitHub)
+# Install Neovim via official pre-built binary from GitHub
 nvim_install_neovim: true
+
+# Pinned Neovim version (git tag on neovim/neovim releases).
+# IMPORTANT: do NOT use "latest". Neovim 0.12.x changed the tree-sitter
+# query-match API (each capture now returns a LIST of nodes). The AstroNvim v5
+# config deployed by this role pins nvim-treesitter to its now-archived
+# "master" branch, whose directive handlers still index a single node. On 0.12.x
+# every file open crashes with:
+#   vim/treesitter.lua: attempt to call method 'range' (a nil value)
+# 0.11.x is the newest compatible line. Revisit once AstroNvim upstream adopts
+# the nvim-treesitter "main" branch (see ROADMAP.md).
+nvim_version: "v0.11.7"
 
 # ============================================================================
 # Core Dependencies (Required)
