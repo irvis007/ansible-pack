@@ -125,6 +125,14 @@ This roadmap tracks planned features, improvements, and priorities for the ansib
 - [ ] Create validate.yml playbook
 - [ ] Add idempotency tests for all roles
 
+### Neovim Toolchain
+- [ ] Migrate to nvim-treesitter `main` branch once AstroNvim upstream adopts it,
+      then unpin `nvim_version` (currently pinned to v0.11.7 in roles/nvim).
+      Reason: nvim-treesitter `master` is archived and its query-match API is
+      incompatible with Neovim 0.12.x ("attempt to call method 'range' (a nil value)").
+      AstroNvim v5 hardcodes `branch = "master"` + `main = "nvim-treesitter.configs"`,
+      so the migration is gated on upstream, not on this repo.
+
 ### Use Case Optimization
 - [ ] Ansible development environment playbook (ansible_dev.yml)
 - [ ] Work machine profile/inventory examples

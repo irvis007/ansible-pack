@@ -1,26 +1,36 @@
 ---
 # Install Neovim (Official pre-built binary from GitHub - Latest Stable)
 
-- name: "[nvim] Check if Neovim is already installed"
+- name: "[nvim] Check currently installed Neovim version (if any)"
   ansible.builtin.command: nvim --version
   register: nvim_check
   failed_when: false
   changed_when: false
 
-- name: "[nvim] Download Neovim pre-built binary (latest stable)"
+# Install/reinstall when Neovim is missing OR the installed version does not
+# match the pinned nvim_version. This lets a re-run heal machines that already
+# have an incompatible version (e.g. a previously installed "latest" 0.12.x).
+- name: "[nvim] Determine whether the pinned Neovim version needs installing"
+  ansible.builtin.set_fact:
+    nvim_needs_install: "{{ nvim_check.rc != 0 or nvim_version not in (nvim_check.stdout | default('')) }}"
+
+- name: "[nvim] Download Neovim pre-built binary ({{ nvim_version }})"
   become: true
   ansible.builtin.get_url:
-    url: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
+    url: "https://github.com/neovim/neovim/releases/download/{{ nvim_version }}/nvim-linux-x86_64.tar.gz"
     dest: "/tmp/nvim-linux64.tar.gz"
     mode: "0644"
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
-- name: "[nvim] Remove old nvim-linux64 directory if exists"
+- name: "[nvim] Remove previous Neovim install directories if present"
   become: true
   ansible.builtin.file:
-    path: "/opt/nvim-linux64"
+    path: "{{ item }}"
     state: absent
-  when: nvim_check.rc != 0
+  loop:
+    - "/opt/nvim-linux-x86_64"  # current layout
+    - "/opt/nvim-linux64"       # legacy layout
+  when: nvim_needs_install
 
 - name: "[nvim] Extract Neovim pre-built binary"
   become: true
@@ -28,7 +38,7 @@
     src: "/tmp/nvim-linux64.tar.gz"
     dest: "/opt"
     remote_src: yes
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
 - name: "[nvim] Ensure /usr/local/bin directory exists"
   become: true
@@ -36,7 +46,7 @@
     path: "/usr/local/bin"
     state: directory
     mode: "0755"
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
 - name: "[nvim] Create symlink for nvim binary"
   become: true
@@ -46,7 +56,7 @@
     state: link
     follow: false
     force: yes
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
 - name: "[nvim] Ensure /usr/local/bin is in system PATH"
   become: true
@@ -55,14 +65,14 @@
     line: 'export PATH="/usr/local/bin:$PATH"'
     create: yes
     mode: "0644"
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
 - name: "[nvim] Cleanup downloaded tarball"
   become: true
   ansible.builtin.file:
     path: "/tmp/nvim-linux64.tar.gz"
     state: absent
-  when: nvim_check.rc != 0
+  when: nvim_needs_install
 
 - name: "[nvim] Verify Neovim installation"
   ansible.builtin.command: /usr/local/bin/nvim --version
