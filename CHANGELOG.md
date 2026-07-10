@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/irvis007/ansible-pack/compare/v1.9.0...v1.9.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* **nvim:** Fix for failing treesitter ([1874cab](https://github.com/irvis007/ansible-pack/commit/1874cabf8c2d56ac9c5601cddad43a273b730a11))
+
 # [1.9.0](https://github.com/irvis007/ansible-pack/compare/v1.8.2...v1.9.0) (2026-07-10)
 
 
