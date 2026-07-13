@@ -36,6 +36,15 @@ obsidian_enabled: true
 # Pomotroid - Pomodoro timer
 pomotroid_enabled: true
 
+# Flameshot snipping tool
+flameshot_enabled: true
+
+# Rebind the XFCE screenshot key from the default tool (xfce4-screenshooter)
+# to Flameshot. XFCE-specific (uses the xfce4-keyboard-shortcuts channel).
+flameshot_set_keybinding: true
+flameshot_keybinding_key: "Print"       # key in /commands/custom to override
+flameshot_command: "flameshot gui"      # interactive region capture + annotate
+
 # ============================================================================
 # Installation Configuration
 # ============================================================================
@@ -43,6 +52,24 @@ pomotroid_enabled: true
 # Directory for AppImage applications
 appimage_install_dir: "/opt/appimages"
 appimage_bin_dir: "/usr/local/bin"
+
+# ============================================================================
+# Desktop Integration
+# ============================================================================
+# Generate .desktop launchers so AppImage apps show up in the application
+# finder / menu (they otherwise only exist as terminal commands).
+appimage_create_desktop_entries: true
+appimage_desktop_dir: "{{ ansible_env.HOME }}/.local/share/applications"
+appimage_icon_dir: "{{ ansible_env.HOME }}/.local/share/icons/appimages"
+
+# Autostart the Nextcloud sync client in the background/tray at login
+nextcloud_autostart: true
+
+# AppImage release-asset architecture filter. Several projects (e.g. Obsidian)
+# publish both x86_64 and arm64 AppImages; without this the "first" asset can be
+# the arm64 one, which fails with "exec format error" on x86_64. Reject non-x86_64
+# assets by name.
+appimage_arch_reject: "(?i)(arm64|aarch64|armhf|armv7l?|i386|i686)"
 
 # Obsidian version (if using direct download)
 obsidian_version: "latest"

@@ -2,6 +2,29 @@
 # Install productivity tools (no snap!)
 
 # ============================================================================
+# Flameshot 
+# ============================================================================
+- name: "[applications] Install Flameshot (screenshot/snipping tool)"
+  become: true
+  ansible.builtin.apt:
+    name: flameshot
+    state: present
+    update_cache: yes
+  when: flameshot_enabled | bool
+  tags: ['flameshot']
+
+# Per-user XFCE setting: run WITHOUT become so it targets the invoking user's
+# session bus. Requires a running XFCE session (xfconfd on the session D-Bus).
+- name: "[applications] Bind '{{ flameshot_keybinding_key }}' key to Flameshot (XFCE)"
+  community.general.xfconf:
+    channel: xfce4-keyboard-shortcuts
+    property: "/commands/custom/{{ flameshot_keybinding_key }}"
+    value_type: string
+    value: "{{ flameshot_command }}"
+  when: flameshot_enabled | bool and flameshot_set_keybinding | bool
+  tags: ['flameshot']
+
+# ============================================================================
 # Setup: Create AppImage directories
 # ============================================================================
 - name: "[applications] Create AppImage directory"
@@ -30,7 +53,7 @@
 
 - name: "[applications] Download Nextcloud AppImage"
   ansible.builtin.get_url:
-    url: "{{ nextcloud_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | map(attribute='browser_download_url') | first }}"
+    url: "{{ nextcloud_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | rejectattr('name', 'search', appimage_arch_reject) | map(attribute='browser_download_url') | first }}"
     dest: "{{ appimage_install_dir }}/Nextcloud.AppImage"
     mode: '0755'
   become: true
@@ -45,6 +68,17 @@
     follow: false
     force: yes
   when: nextcloud_enabled | bool
+
+- name: "[applications] Create Nextcloud desktop launcher + autostart"
+  ansible.builtin.include_tasks: desktop-entry.yml
+  vars:
+    de_cmd: "nextcloud"
+    de_appimage: "{{ appimage_install_dir }}/Nextcloud.AppImage"
+    de_name: "Nextcloud"
+    de_comment: "Nextcloud desktop synchronization client"
+    de_categories: "Network;FileTransfer;"
+    de_autostart: "{{ nextcloud_autostart }}"
+  when: nextcloud_enabled | bool and appimage_create_desktop_entries | bool
 
 # ============================================================================
 # Obsidian - Note-taking app (AppImage)
@@ -65,7 +99,7 @@
 - name: "[applications] Download Obsidian AppImage"
   become: true
   ansible.builtin.get_url:
-    url: "{{ obsidian_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | map(attribute='browser_download_url') | first }}"
+    url: "{{ obsidian_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | rejectattr('name', 'search', appimage_arch_reject) | map(attribute='browser_download_url') | first }}"
     dest: "{{ appimage_install_dir }}/Obsidian.AppImage"
     mode: '0755'
   when:
@@ -80,6 +114,16 @@
     state: link
     follow: false
   when: obsidian_enabled | bool
+
+- name: "[applications] Create Obsidian desktop launcher"
+  ansible.builtin.include_tasks: desktop-entry.yml
+  vars:
+    de_cmd: "obsidian"
+    de_appimage: "{{ appimage_install_dir }}/Obsidian.AppImage"
+    de_name: "Obsidian"
+    de_comment: "Markdown knowledge base and note-taking"
+    de_categories: "Office;TextEditor;"
+  when: obsidian_enabled | bool and appimage_create_desktop_entries | bool
 
 # ============================================================================
 # Pomotroid - Pomodoro timer (AppImage from GitHub)
@@ -102,7 +146,7 @@
 - name: "[applications] Download Pomotroid AppImage"
   become: true
   ansible.builtin.get_url:
-    url: "{{ pomotroid_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | map(attribute='browser_download_url') | first }}"
+    url: "{{ pomotroid_latest.json.assets | selectattr('name', 'match', '.*\\.AppImage$') | rejectattr('name', 'search', appimage_arch_reject) | map(attribute='browser_download_url') | first }}"
     dest: "{{ appimage_install_dir }}/Pomotroid.AppImage"
     mode: '0755'
   when:
@@ -117,3 +161,13 @@
     state: link
     follow: false
   when: pomotroid_enabled | bool
+
+- name: "[applications] Create Pomotroid desktop launcher"
+  ansible.builtin.include_tasks: desktop-entry.yml
+  vars:
+    de_cmd: "pomotroid"
+    de_appimage: "{{ appimage_install_dir }}/Pomotroid.AppImage"
+    de_name: "Pomotroid"
+    de_comment: "Simple and configurable Pomodoro timer"
+    de_categories: "Utility;"
+  when: pomotroid_enabled | bool and appimage_create_desktop_entries | bool

@@ -15,4 +15,5 @@
 - name: "[applications] Install productivity tools"
   include_tasks: productivity.yml
   when: applications_install_productivity | bool
-  tags: ['applications', 'productivity']
+  # 'flameshot' lets `--tags flameshot` reach the (dynamically included) task below
+  tags: ['applications', 'productivity', 'flameshot']
