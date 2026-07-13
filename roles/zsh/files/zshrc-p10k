@@ -101,6 +101,25 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# --- zoxide: reliable Tab picker -------------------------------------------
+# zoxide >=0.9.3 delivers `z <query><Tab>` completion via an async terminal
+# DSR (\e[5n / \e[0n) handshake that fails under Powerlevel10k / Terminator /
+# tmux, so Tab stops listing matches. Restore the older synchronous behaviour:
+# Tab on a `z` command opens the fzf picker inline and inserts the choice.
+if (( ${+functions[__zoxide_z_complete]} )); then
+  function __zoxide_z_complete() {
+    # Only complete at end of line.
+    [[ "${#words[@]}" -eq "${CURRENT}" ]] || return 0
+    local result
+    if result="$(\command zoxide query --exclude "$(__zoxide_pwd 2>/dev/null || \builtin true)" --interactive -- ${words[2,-1]} 2>/dev/null)"; then
+      compadd -Q -- "${(q-)result}"
+    fi
+    \builtin printf '\e[5n'   # nudge a prompt redraw after fzf
+    return 0
+  }
+  \builtin bindkey '\e[0n' 'reset-prompt'
+fi
+
 
 # Aliases with eza
 alias l='eza -lah --color=always --icons --group-directories-first' # with headers
