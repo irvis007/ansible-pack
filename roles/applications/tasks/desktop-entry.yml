@@ -1,0 +1,97 @@
+---
+# Reusable: create a .desktop launcher (and optional autostart entry) for an
+# AppImage app, extracting its icon so it appears in the application finder.
+#
+# Required vars:
+#   de_cmd        - command / symlink name (e.g. "nextcloud"); also the file basename
+#   de_appimage   - full path to the AppImage (icon is extracted from it)
+#   de_name       - display Name shown in the menu
+#   de_comment    - Comment / tooltip
+#   de_categories - freedesktop Categories value (e.g. "Utility;")
+# Optional vars:
+#   de_autostart  - when true, also write ~/.config/autostart/<de_cmd>.desktop (default: false)
+#   de_exec_args  - args appended to Exec (default: "%U")
+
+- name: "[applications] Ensure desktop + icon directories exist ({{ de_cmd }})"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ appimage_desktop_dir }}"
+    - "{{ appimage_icon_dir }}"
+
+- name: "[applications] Create temp dir for icon extraction ({{ de_cmd }})"
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: "-{{ de_cmd }}-appimg"
+  register: de_tmp
+  changed_when: false
+
+# AppImages are world-readable (0755); extract as the normal user (no become).
+# Try the standard icon location first, then a root-level icon as fallback,
+# then copy the largest resulting png/svg to a stable path.
+- name: "[applications] Extract icon from AppImage ({{ de_cmd }})"
+  ansible.builtin.shell:
+    chdir: "{{ de_tmp.path }}"
+    cmd: |
+      set -e
+      "{{ de_appimage }}" --appimage-extract 'usr/share/icons/*' >/dev/null 2>&1 || true
+      "{{ de_appimage }}" --appimage-extract '*.png' >/dev/null 2>&1 || true
+      icon=$(find squashfs-root -type f \( -name '*.png' -o -name '*.svg' \) 2>/dev/null \
+              | xargs -I{} sh -c 'echo "$(stat -c %s "{}") {}"' 2>/dev/null \
+              | sort -rn | head -1 | cut -d' ' -f2-)
+      [ -n "$icon" ] || { echo "NO_ICON"; exit 0; }
+      dest="{{ appimage_icon_dir }}/{{ de_cmd }}.${icon##*.}"
+      cp -f "$icon" "$dest"
+      echo "$dest"
+  register: de_icon
+  changed_when: false
+
+- name: "[applications] Set icon fact ({{ de_cmd }})"
+  ansible.builtin.set_fact:
+    de_icon_path: "{{ (de_icon.stdout | trim) if (de_icon.stdout | trim) not in ['', 'NO_ICON'] else de_cmd }}"
+
+- name: "[applications] Write .desktop launcher ({{ de_cmd }})"
+  ansible.builtin.copy:
+    dest: "{{ appimage_desktop_dir }}/{{ de_cmd }}.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name={{ de_name }}
+      Comment={{ de_comment }}
+      Exec={{ appimage_bin_dir }}/{{ de_cmd }} {{ de_exec_args | default('%U') }}
+      Icon={{ de_icon_path }}
+      Terminal=false
+      Categories={{ de_categories }}
+
+- name: "[applications] Ensure autostart directory exists ({{ de_cmd }})"
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+    mode: "0755"
+  when: de_autostart | default(false) | bool
+
+- name: "[applications] Write autostart entry ({{ de_cmd }})"
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/autostart/{{ de_cmd }}.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name={{ de_name }}
+      Comment={{ de_comment }}
+      Exec={{ appimage_bin_dir }}/{{ de_cmd }} --background
+      Icon={{ de_icon_path }}
+      Terminal=false
+      Categories={{ de_categories }}
+      X-GNOME-Autostart-enabled=true
+      X-GNOME-Autostart-Delay=3
+  when: de_autostart | default(false) | bool
+
+- name: "[applications] Cleanup icon extraction temp dir ({{ de_cmd }})"
+  ansible.builtin.file:
+    path: "{{ de_tmp.path }}"
+    state: absent
+  changed_when: false
