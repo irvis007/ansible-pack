@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/irvis007/ansible-pack/compare/v1.9.1...v1.9.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* **applications:** Fix for apps not found ([de8db09](https://github.com/irvis007/ansible-pack/commit/de8db09c8018e83a5bb0b6a1c19b813278c1ed5c))
+
 ## [1.9.1](https://github.com/irvis007/ansible-pack/compare/v1.9.0...v1.9.1) (2026-07-10)
 
 
