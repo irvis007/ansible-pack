@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/irvis007/ansible-pack/compare/v1.9.2...v1.9.3) (2026-07-14)
+
+
+### Bug Fixes
+
+* **zoxide:** Fix for dead tab with `z` ([e1ffea3](https://github.com/irvis007/ansible-pack/commit/e1ffea33247b6dcc6afbdc023703548c8b6c4a5d))
+
 ## [1.9.2](https://github.com/irvis007/ansible-pack/compare/v1.9.1...v1.9.2) (2026-07-13)
 
 
